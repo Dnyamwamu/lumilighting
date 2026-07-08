@@ -1,0 +1,477 @@
+# LUMI Lighting — Production Deployment & Setup Guidelines
+
+This document provides comprehensive guidelines for deploying the **LUMI Lighting** e-commerce ecosystem to production. It covers the setup, configuration, security, and optimization of the Next.js storefront, Medusa v2 backend, Admin Analytics Dashboard, database, caching, search indices, and payment gateways.
+
+---
+
+## 🏗️ Production Architecture Overview
+
+In production, the local development components (like the Ngrok sidecar) are replaced with secure, managed cloud services:
+
+```mermaid
+graph TD
+  User((Client Browser)) -->|HTTPS| CDN[Edge CDN / Vercel]
+  CEO((CEO / Executive)) -->|HTTPS| AdminDash[Admin Analytics Dashboard]
+  CDN -->|Next.js App Router| Storefront[Storefront Production Instance]
+  Storefront -->|Auth Validation| Clerk[Clerk Production Auth]
+  Storefront -->|Read Queries| Sanity[Sanity CMS Production]
+  Storefront -->|M-Pesa STK Push| Safaricom[Safaricom Daraja API Production]
+  
+  Storefront -->|REST API calls| LB[Application Load Balancer]
+  LB -->|API Route Requests| MedusaAPI[Medusa v2 API Nodes]
+  
+  MedusaAPI -->|Read/Write| PostgresPool[PostgreSQL Connection Pool / PgBouncer]
+  PostgresPool -->|Primary DB| RDS[(Managed PostgreSQL - e.g., AWS RDS / Neon)]
+  
+  MedusaAPI -->|PubSub / Queue Jobs| Redis[(Managed Redis - e.g., Upstash / ElastiCache)]
+  Redis -->|Background Processing| MedusaWorker[Medusa v2 Worker Nodes]
+  
+  MedusaAPI -->|Push Index| Meilisearch[(Meilisearch Cloud / Secure Instance)]
+  Storefront -->|Scoped Search Key| Meilisearch
+  
+  MedusaAPI -->|Upload Media| Cloudinary[Cloudinary Production CDN]
+  AdminDash -->|Direct SQL Query| RDS
+  AdminDash -->|OAuth Reports| QB[QuickBooks Online Production]
+```
+
+---
+
+## 🔒 1. Medusa v2 Backend Production Setup
+
+The Medusa backend is a modular node application. In production, we separate the API nodes from the worker nodes for horizontal scalability.
+
+### A. Environment Configuration (`.env.production`)
+Create a secure environment file on your production host or hosting platform:
+
+```env
+# Node Environment
+NODE_ENV=production
+
+# Server Configuration
+PORT=9000
+STORE_CORS=https://lumilighting.co.ke,https://www.lumilighting.co.ke
+ADMIN_CORS=https://admin.lumilighting.co.ke,https://dashboard.lumilighting.co.ke
+AUTH_CORS=https://admin.lumilighting.co.ke,https://dashboard.lumilighting.co.ke
+
+# Database Configuration (Always use SSL in production)
+DATABASE_URL=postgres://<username>:<password>@<host>:<port>/<db_name>?sslmode=require
+# If using PgBouncer/connection pooling:
+# DATABASE_URL=postgres://<username>:<password>@<bouncer_host>:<port>/<db_name>?sslmode=require&pgbouncer=true
+
+# Redis Configuration (For event processing and job queues)
+REDIS_URL=rediss://default:<redis_password>@<redis_host>:<redis_port>
+
+# Core Security Secrets (Generate using openssl rand -base64 32)
+JWT_SECRET=prod_jwt_secret_here
+COOKIE_SECRET=prod_cookie_secret_here
+
+# Cloudinary Integration (Ensure production buckets/folders are configured)
+CLOUDINARY_CLOUD_NAME=prod_cloud_name
+CLOUDINARY_API_KEY=prod_api_key
+CLOUDINARY_API_SECRET=prod_api_secret
+
+# QuickBooks Online Production Credentials
+QB_CLIENT_ID=prod_quickbooks_client_id
+QB_CLIENT_SECRET=prod_quickbooks_client_secret
+QB_REDIRECT_URI=https://api.lumilighting.co.ke/admin/quickbooks/callback
+```
+
+### B. Database Migration & Initialization
+Always run database migrations in the release phase before traffic hits the container:
+```bash
+# Apply migrations
+pnpm exec medusa db:migrate
+
+# Update QuickBooks integration database tables
+pnpm --filter @dtc/backend exec medusa db:generate quickbooks
+pnpm exec medusa db:migrate
+```
+
+### C. Scaling API vs Worker
+In production, run Medusa in two separate instances/containers:
+1. **API Server**: Handles HTTP request routing. Run with:
+   ```bash
+   pnpm exec medusa start
+   ```
+2. **Worker Server**: Handles event subscribers, email dispatching, QuickBooks syncs, and search index pushes. Run with:
+   ```bash
+   pnpm exec medusa start --worker
+   ```
+
+---
+
+## 🌐 2. Next.js Storefront Production Setup
+
+The storefront should be deployed to a high-availability CDN/hosting platform like Vercel or AWS Amplify.
+
+### A. Environment Configuration (`.env.production`)
+Configure the following environment variables in your hosting provider's dashboard:
+
+```env
+# Next.js Server Configurations
+PORT=3000
+NODE_ENV=production
+
+# Medusa API Routing (Point to your production load balancer or domain)
+MEDUSA_BACKEND_URL=https://api.lumilighting.co.ke
+NEXT_PUBLIC_MEDUSA_BACKEND_URL=https://api.lumilighting.co.ke
+NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_prod_your_publishable_key_here
+
+# Clerk Production Credentials
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_your_clerk_publishable_key
+CLERK_SECRET_KEY=sk_live_your_clerk_secret_key
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+
+# Sanity CMS Production Credentials
+NEXT_PUBLIC_SANITY_PROJECT_ID=0egqukia
+NEXT_PUBLIC_SANITY_DATASET=production
+SANITY_API_READ_TOKEN=your_sanity_read_token # Required for secure static builds / previews
+
+# Meilisearch Production Search
+NEXT_PUBLIC_FEATURE_SEARCH_ENABLED=true
+NEXT_PUBLIC_SEARCH_ENDPOINT=https://search.lumilighting.co.ke
+# IMPORTANT: Use a scoped public search key, NEVER your master key!
+NEXT_PUBLIC_SEARCH_API_KEY=your_scoped_search_only_api_key
+NEXT_PUBLIC_INDEX_NAME=products
+
+# Titan SMTP Configuration (Email Notification)
+SMTP_HOST=smtp.titan.email
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=info@lumilighting.co.ke
+SMTP_PASSWORD=prod_smtp_password
+DEALER_EMAIL=info@lumilighting.co.ke
+SMTP_FROM_EMAIL=Lumi Lighting <info@lumilighting.co.ke>
+
+# Safaricom M-Pesa Production Credentials
+MPESA_ENVIRONMENT=production
+MPESA_CONSUMER_KEY=live_consumer_key
+MPESA_CONSUMER_SECRET=live_consumer_secret
+MPESA_SHORTCODE=your_live_paybill_or_till_number
+MPESA_PASSKEY=live_passkey_for_stk_push
+# Must be HTTPS and accessible to Safaricom's gateway IPs
+MPESA_CALLBACK_URL=https://lumilighting.co.ke/api/mpesa/callback
+```
+
+### B. Clerk Domain & Redirect Configurations
+1. Go to the **Clerk Dashboard -> Paths**.
+2. Change the application type to **Production**.
+3. Set your production domain: `lumilighting.co.ke`.
+4. Add DNS records (CNAME) generated by Clerk for SSL and session cookie sync across subdomains.
+
+---
+
+## 📈 3. Admin Analytics Dashboard (CEO Portal) Setup
+
+The CEO portal runs on a separate Next.js instance, querying data directly from the Medusa PostgreSQL database.
+
+### A. Environment Configuration (`.env.production`)
+```env
+PORT=3001
+NODE_ENV=production
+HOSTNAME=0.0.0.0
+
+# Direct access to primary/replica database
+DATABASE_URL=postgres://<username>:<password>@<db_host>:<port>/<db_name>?sslmode=require
+
+# Clerk Authorization Configurations (Must match Clerk Admin group configurations)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_live_your_clerk_publishable_key
+CLERK_SECRET_KEY=sk_live_your_clerk_secret_key
+```
+
+### B. Analytics Warehouse Synchronization
+Ensure that event subscribers are running on the Medusa worker node. On any storefront action (`order.placed`, `product.updated`), the subscriber updates reporting tables in PostgreSQL:
+* `daily_sales`
+* `monthly_sales`
+* `product_sales`
+* `customer_metrics`
+* `inventory_metrics`
+* `mpesa_transaction`
+
+Verify that the database user configured in the Analytics Dashboard has read/write permissions for these custom analytics tables.
+
+---
+
+## 💳 4. Safaricom M-Pesa (Daraja API) Production Transition
+
+Transitioning M-Pesa STK Push from the developer Sandbox to Production requires strict coordination with Safaricom.
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant Customer as Client Browser
+  participant Store as Next.js Storefront API
+  participant Safaricom as Safaricom Production API
+  participant Phone as Customer Mobile Phone
+
+  Customer->>Store: Initiate Checkout (M-Pesa Number)
+  Store->>Safaricom: Secure POST /stkpush (OAuth + Passkey)
+  Safaricom-->>Store: Response 200 (MerchantRequestID, CheckoutRequestID)
+  Safaricom->>Phone: STK Push PIN Prompt
+  Phone->>Safaricom: User inputs PIN & approves
+  Safaricom->>Store: Async POST /api/mpesa/callback (HTTPS + JSON Payload)
+  Store->>Store: Verify signature, amount & update Cart status
+  Store-->>Customer: Order Completed Page
+```
+
+### Step-by-Step Transition Plan
+
+1. **Obtain M-Pesa Merchant Credentials**:
+   * Get your Safaricom Paybill Number or Till Number.
+   * Create an Organization Account on the [Safaricom Partner Portal](https://org.safaricom.co.ke/).
+   * Create a Developer Account on the [Safaricom Developer Portal](https://developer.safaricom.co.ke/).
+
+2. **Go Live on the Developer Portal**:
+   * Navigate to **My Apps** in the Developer Portal.
+   * Click **Go Live** and select the production package.
+   * Enter your Organization Shortcode (Paybill/Till), Operator Username, and password.
+   * Retrieve your **Live Consumer Key** and **Live Consumer Secret**.
+
+3. **Get Live Passkey / Security Credentials**:
+   * For C2B STK Push, you need the Passkey. Safaricom will send this to your registered primary email address upon successful validation of the "Go Live" request.
+   * Alternatively, generate an **Initiator Security Credential** via the M-Pesa portal.
+
+4. **Setup Secure Callback Endpoints**:
+   * **HTTPS Requirement**: Safaricom *strictly* requires callbacks to be delivered via HTTPS. SSL certificates must be valid (not self-signed).
+   * **Port Requirements**: Ensure the storefront webhook port (`443`) is open on your firewall and does not block Safaricom IP ranges (Safaricom uses specific IP blocks to post webhook data).
+   * Update the environment variable:
+     `MPESA_CALLBACK_URL=https://lumilighting.co.ke/api/mpesa/callback`
+
+---
+
+## 🔍 5. Meilisearch Production Hardening
+
+Meilisearch must be secured before exposing it on the public internet.
+
+1. **Deploy Meilisearch**: Deploy Meilisearch on a secure virtual machine or use Meilisearch Cloud.
+2. **Enable Production Mode**: Set `MEILI_ENV=production` inside Meilisearch environment variables.
+3. **Configure Master Key**: Create a strong master key:
+   ```bash
+   MEILI_MASTER_KEY=your_extremely_strong_master_key
+   ```
+4. **Generate Public Scoped API Key**:
+   Do *not* expose the Master Key in the browser. Run this command on your backend server or locally to generate a search-only key:
+   ```bash
+   curl \
+     -X POST 'https://search.lumilighting.co.ke/keys' \
+     -H 'Authorization: Bearer your_extremely_strong_master_key' \
+     -H 'Content-Type: application/json' \
+     --data-raw '{
+       "description": "Search-only key for Storefront",
+       "actions": ["search"],
+       "indexes": ["products"],
+       "expiresAt": null
+     }'
+   ```
+   Use the returned `key` value for `NEXT_PUBLIC_SEARCH_API_KEY` on the storefront.
+
+---
+
+## 🎨 6. Sanity CMS Production Config
+
+1. Go to your [Sanity Manage Dashboard](https://www.sanity.io/manage).
+2. Choose your project ID: `0egqukia`.
+3. Navigate to **API settings -> CORS origins**.
+4. Add your production domain:
+   * `https://lumilighting.co.ke` (Allow credentials: Checked)
+   * `https://www.lumilighting.co.ke` (Allow credentials: Checked)
+5. Create a token with **Read** access and set it as `SANITY_API_READ_TOKEN` on the storefront server to fetch fresh content during build time.
+
+---
+
+## 🐳 7. Docker Production Compose Template
+
+If hosting the backend, dashboard, database, and cache on a single virtual machine (e.g. AWS EC2, DigitalOcean Droplet), use this optimized `docker-compose.prod.yml` template:
+
+```yaml
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: lumi_prod_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: medusa-store-prod
+      POSTGRES_USER: ${PROD_DB_USER}
+      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - lumi_prod_network
+
+  # Redis Cache & Queue
+  redis:
+    image: redis:7-alpine
+    container_name: lumi_prod_redis
+    restart: always
+    command: redis-server --requirepass ${PROD_REDIS_PASSWORD}
+    volumes:
+      - redis_prod_data:/data
+    networks:
+      - lumi_prod_network
+
+  # Medusa API Node
+  medusa-api:
+    build:
+      context: ./lumilightingco-medusa
+      dockerfile: Dockerfile
+    container_name: lumi_prod_api
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://${PROD_DB_USER}:${PROD_DB_PASSWORD}@postgres:5432/medusa-store-prod?sslmode=disable
+      - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD}@redis:6379
+    env_file:
+      - ./lumilightingco-medusa/apps/backend/.env.production
+    command: pnpm exec medusa start
+    networks:
+      - lumi_prod_network
+
+  # Medusa Worker Node
+  medusa-worker:
+    build:
+      context: ./lumilightingco-medusa
+      dockerfile: Dockerfile
+    container_name: lumi_prod_worker
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://${PROD_DB_USER}:${PROD_DB_PASSWORD}@postgres:5432/medusa-store-prod?sslmode=disable
+      - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD}@redis:6379
+    env_file:
+      - ./lumilightingco-medusa/apps/backend/.env.production
+    command: pnpm exec medusa start --worker
+    networks:
+      - lumi_prod_network
+
+  # Next.js Storefront
+  storefront:
+    build:
+      context: ./lumilightingco
+      dockerfile: Dockerfile
+    container_name: lumi_prod_storefront
+    restart: always
+    depends_on:
+      - medusa-api
+    environment:
+      - MEDUSA_BACKEND_URL=http://medusa-api:9000
+    env_file:
+      - ./lumilightingco/.env.production
+    networks:
+      - lumi_prod_network
+
+  # Nginx Reverse Proxy with SSL (SSL termination)
+  nginx:
+    image: nginx:alpine
+    container_name: lumi_prod_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - storefront
+      - medusa-api
+    networks:
+      - lumi_prod_network
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+
+networks:
+  lumi_prod_network:
+    driver: bridge
+```
+
+---
+
+## 🚀 8. Build, Deploy & Monitoring Checklists
+
+### Build Commands
+Run clean builds before staging:
+
+* **Next.js Storefront Build**:
+  ```bash
+  cd lumilightingco
+  pnpm install
+  pnpm run build
+  ```
+* **Medusa Backend Build**:
+  ```bash
+  cd lumilightingco-medusa/apps/backend
+  pnpm install
+  pnpm run build
+  ```
+
+### Active Performance & Error Logging (Sentry)
+Ensure Sentry is monitoring client crash logs:
+1. Verify the project has `@sentry/nextjs` installed.
+2. Setup Sentry environment keys: `SENTRY_AUTH_TOKEN`, `NEXT_PUBLIC_SENTRY_DSN`.
+3. Check storefront logs inside the Sentry Issue dashboard.
+
+### SSL / Nginx Config Template
+Here is a sample `nginx.conf` block for SSL termination and reverse proxying requests:
+
+```nginx
+server {
+    listen 80;
+    server_name lumilighting.co.ke www.lumilighting.co.ke;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name lumilighting.co.ke www.lumilighting.co.ke;
+
+    ssl_certificate /etc/letsencrypt/live/lumilighting.co.ke/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/lumilighting.co.ke/privkey.pem;
+
+    # Storefront (Next.js)
+    location / {
+        proxy_pass http://storefront:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Safaricom Webhook endpoint directly handled by Next.js storefront API
+    location /api/mpesa/ {
+        proxy_pass http://storefront:3000/api/mpesa/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 60s;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name api.lumilighting.co.ke;
+
+    ssl_certificate /etc/letsencrypt/live/lumilighting.co.ke/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/lumilighting.co.ke/privkey.pem;
+
+    # Medusa backend
+    location / {
+        proxy_pass http://medusa-api:9000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
