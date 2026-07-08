@@ -109,7 +109,7 @@ Configure the following environment variables in your hosting provider's dashboa
 
 ```env
 # Next.js Server Configurations
-PORT=3000
+PORT=3010
 NODE_ENV=production
 
 # Medusa API Routing (Point to your production load balancer or domain)
@@ -330,8 +330,11 @@ services:
     env_file:
       - ./lumilightingco-medusa/apps/backend/.env.production
     command: pnpm exec medusa start
+    expose:
+      - "9000"
     networks:
       - lumi_prod_network
+      - web_proxy
 
   # Medusa Worker Node
   medusa-worker:
@@ -364,27 +367,14 @@ services:
       - medusa-api
     environment:
       - MEDUSA_BACKEND_URL=http://medusa-api:9000
+      - PORT=3010
     env_file:
       - ./lumilightingco/.env.production
+    expose:
+      - "3010"
     networks:
       - lumi_prod_network
-
-  # Nginx Reverse Proxy with SSL (SSL termination)
-  nginx:
-    image: nginx:alpine
-    container_name: lumi_prod_nginx
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro
-    depends_on:
-      - storefront
-      - medusa-api
-    networks:
-      - lumi_prod_network
+      - web_proxy
 
 volumes:
   postgres_prod_data:
@@ -393,6 +383,8 @@ volumes:
 networks:
   lumi_prod_network:
     driver: bridge
+  web_proxy:
+    external: true
 ```
 
 ---
@@ -421,57 +413,35 @@ Ensure Sentry is monitoring client crash logs:
 2. Setup Sentry environment keys: `SENTRY_AUTH_TOKEN`, `NEXT_PUBLIC_SENTRY_DSN`.
 3. Check storefront logs inside the Sentry Issue dashboard.
 
-### SSL / Nginx Config Template
-Here is a sample `nginx.conf` block for SSL termination and reverse proxying requests:
+### SSL & Routing via Nginx Proxy Manager
+Instead of deploying a separate Nginx container (which would conflict with the existing Nginx Proxy Manager running on the host), route all incoming traffic directly through your existing **Nginx Proxy Manager Admin Console** (port `81`).
 
-```nginx
-server {
-    listen 80;
-    server_name lumilighting.co.ke www.lumilighting.co.ke;
-    return 301 https://$host$request_uri;
-}
+#### Step 1: Add a Proxy Host for the Storefront
+1. Open Nginx Proxy Manager at `http://<YOUR_SERVER_IP>:81` and log in.
+2. Go to **Proxy Hosts** -> **Add Proxy Host**.
+3. Configure the **Details** tab:
+   * **Domain Names:** `lumilighting.co.ke` and `www.lumilighting.co.ke`
+   * **Scheme:** `http`
+   * **Forward Hostname / IP:** `lumi_prod_storefront` (the container_name in `docker-compose.prod.yml`)
+   * **Forward Port:** `3010`
+   * Check **Block Common Exploits** and **Websockets Support**.
+4. Configure the **SSL** tab:
+   * Select **Request a new SSL Certificate**.
+   * Check **Force SSL** and **HTTP/2 Support**.
+   * Enter your email and agree to the terms.
+5. Click **Save**.
 
-server {
-    listen 443 ssl;
-    server_name lumilighting.co.ke www.lumilighting.co.ke;
+#### Step 2: Add a Proxy Host for the Medusa API
+1. Add a second Proxy Host:
+   * **Domain Names:** `api.lumilighting.co.ke`
+   * **Scheme:** `http`
+   * **Forward Hostname / IP:** `lumi_prod_api` (the container_name in `docker-compose.prod.yml`)
+   * **Forward Port:** `9000`
+   * Check **Block Common Exploits** and **Websockets Support**.
+2. Configure the **SSL** tab:
+   * Select **Request a new SSL Certificate**.
+   * Check **Force SSL** and **HTTP/2 Support**.
+   * Enter your email and agree to the terms.
+3. Click **Save**.
 
-    ssl_certificate /etc/letsencrypt/live/lumilighting.co.ke/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/lumilighting.co.ke/privkey.pem;
-
-    # Storefront (Next.js)
-    location / {
-        proxy_pass http://storefront:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # Safaricom Webhook endpoint directly handled by Next.js storefront API
-    location /api/mpesa/ {
-        proxy_pass http://storefront:3000/api/mpesa/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_read_timeout 60s;
-    }
-}
-
-server {
-    listen 443 ssl;
-    server_name api.lumilighting.co.ke;
-
-    ssl_certificate /etc/letsencrypt/live/lumilighting.co.ke/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/lumilighting.co.ke/privkey.pem;
-
-    # Medusa backend
-    location / {
-        proxy_pass http://medusa-api:9000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
+*Note: Nginx Proxy Manager handles Let's Encrypt certificate renewals and Nginx configuration reloads dynamically, keeping the host ports `80` and `443` free from conflicts.*

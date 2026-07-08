@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: lumi_prod_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: medusa-store-prod
+      POSTGRES_USER: ${PROD_DB_USER}
+      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - lumi_prod_network
+
+  # Redis Cache & Queue
+  redis:
+    image: redis:7-alpine
+    container_name: lumi_prod_redis
+    restart: always
+    command: redis-server --requirepass ${PROD_REDIS_PASSWORD}
+    volumes:
+      - redis_prod_data:/data
+    networks:
+      - lumi_prod_network
+
+  # Medusa API Node
+  medusa-api:
+    build:
+      context: ./lumilightingco-medusa
+      dockerfile: Dockerfile
+    container_name: lumi_prod_api
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://${PROD_DB_USER}:${PROD_DB_PASSWORD}@postgres:5432/medusa-store-prod?sslmode=disable
+      - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD}@redis:6379
+    env_file:
+      - ./lumilightingco-medusa/apps/backend/.env.production
+    command: pnpm exec medusa start
+    expose:
+      - "9000"
+    networks:
+      - lumi_prod_network
+      - web_proxy
+
+  # Medusa Worker Node
+  medusa-worker:
+    build:
+      context: ./lumilightingco-medusa
+      dockerfile: Dockerfile
+    container_name: lumi_prod_worker
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://${PROD_DB_USER}:${PROD_DB_PASSWORD}@postgres:5432/medusa-store-prod?sslmode=disable
+      - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD}@redis:6379
+    env_file:
+      - ./lumilightingco-medusa/apps/backend/.env.production
+    command: pnpm exec medusa start --worker
+    networks:
+      - lumi_prod_network
+
+  # Next.js Storefront
+  storefront:
+    build:
+      context: ./lumilightingco
+      dockerfile: Dockerfile
+    container_name: lumi_prod_storefront
+    restart: always
+    depends_on:
+      - medusa-api
+    environment:
+      - MEDUSA_BACKEND_URL=http://medusa-api:9000
+      - PORT=3010
+    env_file:
+      - ./lumilightingco/.env.production
+    expose:
+      - "3010"
+    networks:
+      - lumi_prod_network
+      - web_proxy
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+
+networks:
+  lumi_prod_network:
+    driver: bridge
+  web_proxy:
+    external: true

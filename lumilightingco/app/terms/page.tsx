@@ -25,7 +25,7 @@ export default function TermsPage() {
           {/* Content */}
           <div className="prose prose-slate dark:prose-invert prose-headings:font-bold prose-a:text-amber-500 hover:prose-a:text-amber-600 max-w-none transition-colors">
             <p className="lead">
-              Welcome to LUMI Lighting. These Terms of Service ("Terms") govern
+              Welcome to LUMI Lighting. These Terms of Service (&quot;Terms&quot;) govern
               your access to and use of our e-commerce platform, showroom
               bookings, and related services in Kenya.
             </p>
