@@ -391,7 +391,24 @@ networks:
 
 ## 🚀 8. Build, Deploy & Monitoring Checklists
 
-### Build Commands
+### Automated Production Deployment
+To deploy updates to the production server:
+
+1. **SSH into the production server**:
+   ```bash
+   ssh user@your-server-ip
+   ```
+2. **Navigate to the project root directory**:
+   ```bash
+   cd /path/to/lumilightingco
+   ```
+3. **Execute the deployment script**:
+   ```bash
+   ./deploy.sh
+   ```
+   *(Note: The script automatically pulls the latest changes, builds the production containers, restarts them with minimal downtime, and applies Medusa database migrations.)*
+
+### Build Commands (Manual)
 Run clean builds before staging:
 
 * **Next.js Storefront Build**:

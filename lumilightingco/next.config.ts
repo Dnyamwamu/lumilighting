@@ -67,4 +67,9 @@ export default withSentryConfig(nextConfig, {
     // Automatically tree-shake Sentry logger statements to reduce bundle size
     excludeDebugStatements: true,
   },
+
+  // Prevent build failure when SENTRY_AUTH_TOKEN is missing (e.g. during Docker builds)
+  errorHandler: (err: unknown) => {
+    console.warn("Sentry CLI Plugin failed, continuing build:", err);
+  },
 })
