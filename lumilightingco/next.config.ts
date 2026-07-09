@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
     // We run type checking separately in the pipeline
     ignoreBuildErrors: true,
   },
+  experimental: {
+    webpackBuildWorker: false,
+  },
   images: {
     remotePatterns: [
       {

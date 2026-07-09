@@ -20,6 +20,7 @@ COPY . .
 # Set Environment variables for build time
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 
 RUN pnpm run build
 
