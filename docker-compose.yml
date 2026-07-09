@@ -6,10 +6,10 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_DB: medusa-store
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: lumi
+      POSTGRES_PASSWORD: Lumilighting@123!
     ports:
-      - "5439:5432"
+      - "5435:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -38,7 +38,7 @@ services:
       - "5174:5173"
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/medusa-store
+      - DATABASE_URL=postgres://lumi:Lumilighting@123!@postgres:5432/medusa-store
       - REDIS_URL=redis://redis:6379
     env_file:
       - ./lumilightingco-medusa/apps/backend/.env
@@ -80,7 +80,7 @@ services:
       - "3001:3001"
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/medusa-store
+      - DATABASE_URL=postgres://lumi:Lumilighting@123!@postgres:5432/medusa-store
       - HOSTNAME=0.0.0.0
     env_file:
       - ./lumilightingco-medusa/apps/admin-dashboard/.env

@@ -7,9 +7,11 @@ services:
     container_name: lumi_prod_postgres
     restart: always
     environment:
-      POSTGRES_DB: medusa-store-prod
+      POSTGRES_DB: medusa-store
       POSTGRES_USER: ${PROD_DB_USER}
       POSTGRES_PASSWORD: ${PROD_DB_PASSWORD}
+    ports:
+      - "5435:5432"
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
     networks:
@@ -38,7 +40,7 @@ services:
       - redis
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgres://${PROD_DB_USER}:${PROD_DB_PASSWORD}@postgres:5432/medusa-store-prod?sslmode=disable
+      - DATABASE_URL=postgres://${PROD_DB_USER}:${PROD_DB_PASSWORD}@postgres:5432/medusa-store?sslmode=disable
       - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD}@redis:6379
     env_file:
       - ./lumilightingco-medusa/apps/backend/.env.production
@@ -61,7 +63,7 @@ services:
       - redis
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgres://${PROD_DB_USER}:${PROD_DB_PASSWORD}@postgres:5432/medusa-store-prod?sslmode=disable
+      - DATABASE_URL=postgres://${PROD_DB_USER}:${PROD_DB_PASSWORD}@postgres:5432/medusa-store?sslmode=disable
       - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD}@redis:6379
     env_file:
       - ./lumilightingco-medusa/apps/backend/.env.production
