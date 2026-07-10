@@ -13,8 +13,12 @@ DB_HOST="postgres"
 DB_PORT="5432"
 
 if [ -n "$DATABASE_URL" ]; then
-  # Remove protocol portion
-  DB_URL_NO_PROTO=${DATABASE_URL#*@}
+  # Strip protocol portion (e.g. postgres://)
+  DB_URL_NO_PROTO=${DATABASE_URL#*//}
+  # Strip credentials up to the last @ if present
+  case "$DB_URL_NO_PROTO" in
+    *@*) DB_URL_NO_PROTO=${DB_URL_NO_PROTO##*@} ;;
+  esac
   # Extract host and port
   DB_HOST_PORT=${DB_URL_NO_PROTO%%/*}
   # Extract host
