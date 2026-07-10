@@ -295,8 +295,8 @@ services:
     restart: always
     environment:
       POSTGRES_DB: medusa-store-prod
-      POSTGRES_USER: ${PROD_DB_USER}
-      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD}
+      POSTGRES_USER: ${PROD_DB_USER:-lumi}
+      POSTGRES_PASSWORD: ${PROD_DB_PASSWORD:-Lumilighting@123!}
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
     networks:
@@ -307,7 +307,7 @@ services:
     image: redis:7-alpine
     container_name: lumi_prod_redis
     restart: always
-    command: redis-server --requirepass ${PROD_REDIS_PASSWORD}
+    command: redis-server --requirepass ${PROD_REDIS_PASSWORD:-LumiRedis123!}
     volumes:
       - redis_prod_data:/data
     networks:
@@ -325,8 +325,8 @@ services:
       - redis
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgres://${PROD_DB_USER}:${PROD_DB_PASSWORD}@postgres:5432/medusa-store-prod?sslmode=disable
-      - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD}@redis:6379
+      - DATABASE_URL=postgres://${PROD_DB_USER:-lumi}:${PROD_DB_PASSWORD:-Lumilighting@123!}@postgres:5432/medusa-store-prod?sslmode=disable
+      - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD:-LumiRedis123!}@redis:6379
     env_file:
       - ./lumilightingco-medusa/apps/backend/.env.production
     command: pnpm --filter @dtc/backend exec medusa start
@@ -348,8 +348,8 @@ services:
       - redis
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgres://${PROD_DB_USER}:${PROD_DB_PASSWORD}@postgres:5432/medusa-store-prod?sslmode=disable
-      - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD}@redis:6379
+      - DATABASE_URL=postgres://${PROD_DB_USER:-lumi}:${PROD_DB_PASSWORD:-Lumilighting@123!}@postgres:5432/medusa-store-prod?sslmode=disable
+      - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD:-LumiRedis123!}@redis:6379
     env_file:
       - ./lumilightingco-medusa/apps/backend/.env.production
     command: pnpm --filter @dtc/backend exec medusa start --worker
