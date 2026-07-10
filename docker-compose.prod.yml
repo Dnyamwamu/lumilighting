@@ -44,7 +44,7 @@ services:
       - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD}@redis:6379
     env_file:
       - ./lumilightingco-medusa/apps/backend/.env.production
-    command: pnpm exec medusa start
+    command: pnpm --filter @dtc/backend exec medusa start
     expose:
       - "9000"
     networks:
@@ -67,7 +67,7 @@ services:
       - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD}@redis:6379
     env_file:
       - ./lumilightingco-medusa/apps/backend/.env.production
-    command: pnpm exec medusa start --worker
+    command: pnpm --filter @dtc/backend exec medusa start --worker
     networks:
       - lumi_prod_network
 

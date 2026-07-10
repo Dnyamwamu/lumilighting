@@ -80,22 +80,22 @@ QB_REDIRECT_URI=https://api.lumilighting.co.ke/admin/quickbooks/callback
 Always run database migrations in the release phase before traffic hits the container:
 ```bash
 # Apply migrations
-pnpm exec medusa db:migrate
+pnpm --filter @dtc/backend exec medusa db:migrate
 
 # Update QuickBooks integration database tables
 pnpm --filter @dtc/backend exec medusa db:generate quickbooks
-pnpm exec medusa db:migrate
+pnpm --filter @dtc/backend exec medusa db:migrate
 ```
 
 ### C. Scaling API vs Worker
 In production, run Medusa in two separate instances/containers:
 1. **API Server**: Handles HTTP request routing. Run with:
    ```bash
-   pnpm exec medusa start
+   pnpm --filter @dtc/backend exec medusa start
    ```
 2. **Worker Server**: Handles event subscribers, email dispatching, QuickBooks syncs, and search index pushes. Run with:
    ```bash
-   pnpm exec medusa start --worker
+   pnpm --filter @dtc/backend exec medusa start --worker
    ```
 
 ---
@@ -329,7 +329,7 @@ services:
       - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD}@redis:6379
     env_file:
       - ./lumilightingco-medusa/apps/backend/.env.production
-    command: pnpm exec medusa start
+    command: pnpm --filter @dtc/backend exec medusa start
     expose:
       - "9000"
     networks:
@@ -352,7 +352,7 @@ services:
       - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD}@redis:6379
     env_file:
       - ./lumilightingco-medusa/apps/backend/.env.production
-    command: pnpm exec medusa start --worker
+    command: pnpm --filter @dtc/backend exec medusa start --worker
     networks:
       - lumi_prod_network
 
