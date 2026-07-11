@@ -6,7 +6,10 @@ import { MedusaError } from "@medusajs/framework/utils"
 type ValidateVariantWishlistStepInput = {
   variant_id: string
   sales_channel_id: string
-  wishlist: InferTypeOf<typeof Wishlist>
+  wishlist: {
+    items?: any[]
+    [key: string]: any
+  }
 }
 
 export const validateVariantWishlistStep = createStep(
@@ -17,7 +20,7 @@ export const validateVariantWishlistStep = createStep(
     wishlist
   }: ValidateVariantWishlistStepInput, { container }) => {
     // validate whether variant is in wishlist
-    const isInWishlist = wishlist.items?.some((item) => item.product_variant_id === variant_id)
+    const isInWishlist = wishlist.items?.some((item) => item?.product_variant_id === variant_id)
 
     if (isInWishlist) {
       throw new MedusaError(
@@ -36,7 +39,7 @@ export const validateVariantWishlistStep = createStep(
       }
     })
 
-    const variantInSalesChannel = data[0].product.sales_channels.some((sc) => sc.id === sales_channel_id)
+    const variantInSalesChannel = data[0]?.product?.sales_channels?.some((sc: any) => sc?.id === sales_channel_id)
 
     if (!variantInSalesChannel) {
       throw new MedusaError(

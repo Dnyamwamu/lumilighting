@@ -46,7 +46,7 @@ export default async function seedCustomShippingOptions({ container }: ExecArgs)
 
   console.log("Existing shipping options:", existingShippingOptions);
 
-  const optionsToCreate = [];
+  const optionsToCreate: any[] = [];
 
   // Check if "Pickup From Store" exists
   const hasPickup = existingShippingOptions.some(o => o.name.toLowerCase().includes("pickup"));

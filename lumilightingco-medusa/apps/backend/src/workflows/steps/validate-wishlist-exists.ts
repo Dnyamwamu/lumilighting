@@ -4,7 +4,7 @@ import { InferTypeOf } from "@medusajs/framework/types"
 import { Wishlist } from "../../modules/wishlist/models/wishlist"
 
 type Input = {
-  wishlists?: InferTypeOf<typeof Wishlist>[]
+  wishlists?: any[]
 }
 
 export const validateWishlistExistsStep = createStep(

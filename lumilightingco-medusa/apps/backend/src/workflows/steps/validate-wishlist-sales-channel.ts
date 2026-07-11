@@ -3,7 +3,10 @@ import { InferTypeOf } from "@medusajs/framework/types"
 import { Wishlist } from "../../modules/wishlist/models/wishlist"
 
 type ValidateWishlistSalesChannelStepInput = {
-  wishlist: InferTypeOf<typeof Wishlist>
+  wishlist: {
+    sales_channel_id: string
+    [key: string]: any
+  }
   sales_channel_id: string
 }
 
