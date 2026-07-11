@@ -60,7 +60,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
           ],
           filters: {
             cart_id: transaction.cart_id
-          }
+          } as any
         });
 
         if (orders.length > 0) {
