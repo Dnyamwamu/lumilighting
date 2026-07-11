@@ -13,6 +13,8 @@ RUN pnpm install --no-frozen-lockfile
 
 COPY . .
 
+RUN pnpm --filter @dtc/backend build
+
 EXPOSE 9000 5173 8000
 
 ENTRYPOINT ["./start.sh"]
