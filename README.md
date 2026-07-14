@@ -148,6 +148,10 @@ To log in to the Medusa Admin Dashboard (accessible at `http://localhost:9001/ap
 
 ```bash
 docker exec -it lumi_backend pnpm --filter @dtc/backend exec medusa user -e admin@lumilighting.co.ke -p Lumilighting@123!
+
+## production
+docker exec -it lumi_prod_api pnpm --filter @dtc/backend exec medusa user -e admin@lumilighting.co.ke -p 'Lumilighting@123!'
+
 ```
 
 ---
