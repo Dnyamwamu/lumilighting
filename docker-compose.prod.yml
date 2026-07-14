@@ -48,10 +48,10 @@ services:
       - "9000"
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "9000"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
+      interval: 10s
+      timeout: 10s
+      retries: 20
+      start_period: 300s
     networks:
       - lumi_prod_network
       - web_proxy
