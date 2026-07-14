@@ -389,7 +389,7 @@ services:
         - NEXT_PUBLIC_SANITY_PROJECT_ID=${NEXT_PUBLIC_SANITY_PROJECT_ID:-0egqukia}
         - NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY:-pk_prod_placeholder}
         - NEXT_PUBLIC_MEDUSA_BACKEND_URL=${NEXT_PUBLIC_MEDUSA_BACKEND_URL:-https://api.lumilighting.co.ke}
-        - MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL:-http://medusa-api:9000}
+        - MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL:-http://lumi_prod_api:9000}
         - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-https://lumilighting.co.ke}
         - NEXT_PUBLIC_DEFAULT_REGION=${NEXT_PUBLIC_DEFAULT_REGION:-ke}
         - NEXT_PUBLIC_SEARCH_ENDPOINT=${NEXT_PUBLIC_SEARCH_ENDPOINT:-https://search.lumilighting.co.ke}
@@ -402,7 +402,7 @@ services:
       medusa-api:
         condition: service_healthy
     environment:
-      - MEDUSA_BACKEND_URL=http://medusa-api:9000
+      - MEDUSA_BACKEND_URL=http://lumi_prod_api:9000
       - PORT=3010
     env_file:
       - ./lumilightingco/.env.production
