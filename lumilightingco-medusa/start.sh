@@ -55,14 +55,13 @@ else
 fi
 
 if [ "$NODE_ENV" = "production" ]; then
+  cd .medusa/server
   if [ "$IS_WORKER" = "true" ]; then
-    echo "Starting Medusa production worker..."
-    exec pnpm start --worker
+    echo "Starting Medusa production worker from .medusa/server..."
+    exec npx medusa start --worker
   else
-    echo "Building Medusa admin panel for production..."
-    pnpm medusa build
-    echo "Starting Medusa production server..."
-    exec pnpm start
+    echo "Starting Medusa production server from .medusa/server..."
+    exec npx medusa start
   fi
 else
   echo "Starting Medusa development server..."
