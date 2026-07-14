@@ -51,8 +51,8 @@ NODE_ENV=production
 # Server Configuration
 PORT=9000
 STORE_CORS=https://lumilighting.co.ke,https://www.lumilighting.co.ke
-ADMIN_CORS=https://admin.lumilighting.co.ke,https://dashboard.lumilighting.co.ke
-AUTH_CORS=https://admin.lumilighting.co.ke,https://dashboard.lumilighting.co.ke
+ADMIN_CORS=https://admin.lumilighting.co.ke,https://dashboard.lumilighting.co.ke,https://api.lumilighting.co.ke
+AUTH_CORS=https://admin.lumilighting.co.ke,https://dashboard.lumilighting.co.ke,https://api.lumilighting.co.ke
 
 # Database Configuration (Always use SSL in production)
 DATABASE_URL=postgres://<username>:<password>@<host>:<port>/<db_name>?sslmode=require
