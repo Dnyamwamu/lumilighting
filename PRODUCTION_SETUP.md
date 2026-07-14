@@ -447,6 +447,25 @@ Ensure Sentry is monitoring client crash logs:
 
 Instead of deploying a separate Nginx container (which would conflict with the existing Nginx Proxy Manager running on the host), route all incoming traffic directly through your existing **Nginx Proxy Manager Admin Console** (port `81`).
 
+#### 📋 Proxy Configurations Reference Table
+
+Below is the configuration checklist for setting up the Proxy Hosts in the Nginx Proxy Manager Admin interface:
+
+| Domain Name(s) | Scheme | Forward Hostname / IP | Forward Port | Key Options | SSL Setup |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `lumilighting.co.ke`<br>`www.lumilighting.co.ke` | `http` | `lumi_prod_storefront` | `3010` | • Block Common Exploits<br>• Websockets Support | • Request Let's Encrypt Certificate<br>• Force SSL<br>• HTTP/2 Support |
+| `api.lumilighting.co.ke` | `http` | `lumi_prod_api` | `9000` | • Block Common Exploits<br>• Websockets Support | • Request Let's Encrypt Certificate<br>• Force SSL<br>• HTTP/2 Support |
+| `admin.lumilighting.co.ke`<br>`dashboard.lumilighting.co.ke` | `http` | `lumi_prod_dashboard` | `3001` | • Block Common Exploits<br>• Websockets Support | • Request Let's Encrypt Certificate<br>• Force SSL<br>• HTTP/2 Support |
+| `search.lumilighting.co.ke` | `http` | `lumi_prod_meilisearch` | `7700` | • Block Common Exploits | • Request Let's Encrypt Certificate<br>• Force SSL<br>• HTTP/2 Support |
+
+> [!IMPORTANT]
+> **Docker Network Hostname Resolution:**
+> The forward hostnames listed above (`lumi_prod_storefront`, `lumi_prod_api`, etc.) assume that Nginx Proxy Manager is running in a Docker container attached to the same user-defined network (e.g., `web_proxy`).
+> 
+> If Nginx Proxy Manager is running directly on the host OS or in a different network environment, change the **Forward Hostname / IP** to the host loopback IP (`127.0.0.1` or the server's public IP) and ensure the corresponding ports (`3010`, `9000`, `3001`, `7700`) are mapped/bound to the host in `docker-compose.prod.yml`.
+
+---
+
 #### Step 1: Add a Proxy Host for the Storefront
 
 1. Open Nginx Proxy Manager at `http://<YOUR_SERVER_IP>:81` and log in.
@@ -471,6 +490,34 @@ Instead of deploying a separate Nginx container (which would conflict with the e
    - **Forward Hostname / IP:** `lumi_prod_api` (the container_name in `docker-compose.prod.yml`)
    - **Forward Port:** `9000`
    - Check **Block Common Exploits** and **Websockets Support**.
+2. Configure the **SSL** tab:
+   - Select **Request a new SSL Certificate**.
+   - Check **Force SSL** and **HTTP/2 Support**.
+   - Enter your email and agree to the terms.
+3. Click **Save**.
+
+#### Step 3: Add a Proxy Host for the Admin Analytics Dashboard
+
+1. Add a third Proxy Host:
+   - **Domain Names:** `admin.lumilighting.co.ke` and `dashboard.lumilighting.co.ke`
+   - **Scheme:** `http`
+   - **Forward Hostname / IP:** `lumi_prod_dashboard`
+   - **Forward Port:** `3001`
+   - Check **Block Common Exploits** and **Websockets Support**.
+2. Configure the **SSL** tab:
+   - Select **Request a new SSL Certificate**.
+   - Check **Force SSL** and **HTTP/2 Support**.
+   - Enter your email and agree to the terms.
+3. Click **Save**.
+
+#### Step 4: Add a Proxy Host for the Meilisearch Service
+
+1. Add a fourth Proxy Host:
+   - **Domain Names:** `search.lumilighting.co.ke`
+   - **Scheme:** `http`
+   - **Forward Hostname / IP:** `lumi_prod_meilisearch`
+   - **Forward Port:** `7700`
+   - Check **Block Common Exploits**.
 2. Configure the **SSL** tab:
    - Select **Request a new SSL Certificate**.
    - Check **Force SSL** and **HTTP/2 Support**.

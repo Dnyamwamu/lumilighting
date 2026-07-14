@@ -11,7 +11,7 @@ services:
       POSTGRES_USER: ${PROD_DB_USER:-lumi}
       POSTGRES_PASSWORD: ${PROD_DB_PASSWORD:-Lumilighting123!}
     ports:
-      - "5435:5432"
+      - "${PROD_DB_PORT:-5435}:5432"
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
     networks:
@@ -46,6 +46,12 @@ services:
       - ./lumilightingco-medusa/apps/backend/.env.production
     expose:
       - "9000"
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9000"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
     networks:
       - lumi_prod_network
       - web_proxy
@@ -58,8 +64,12 @@ services:
     container_name: lumi_prod_worker
     restart: always
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+      medusa-api:
+        condition: service_healthy
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgres://${PROD_DB_USER:-lumi}:${PROD_DB_PASSWORD:-Lumilighting123!}@postgres:5432/medusa-store?sslmode=disable
@@ -75,10 +85,25 @@ services:
     build:
       context: ./lumilightingco
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:-pk_live_placeholder}
+        - CLERK_SECRET_KEY=${CLERK_SECRET_KEY:-sk_live_placeholder}
+        - NEXT_PUBLIC_SANITY_DATASET=${NEXT_PUBLIC_SANITY_DATASET:-production}
+        - NEXT_PUBLIC_SANITY_PROJECT_ID=${NEXT_PUBLIC_SANITY_PROJECT_ID:-0egqukia}
+        - NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY:-pk_prod_placeholder}
+        - NEXT_PUBLIC_MEDUSA_BACKEND_URL=${NEXT_PUBLIC_MEDUSA_BACKEND_URL:-https://api.lumilighting.co.ke}
+        - MEDUSA_BACKEND_URL=${MEDUSA_BACKEND_URL:-http://medusa-api:9000}
+        - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL:-https://lumilighting.co.ke}
+        - NEXT_PUBLIC_DEFAULT_REGION=${NEXT_PUBLIC_DEFAULT_REGION:-ke}
+        - NEXT_PUBLIC_SEARCH_ENDPOINT=${NEXT_PUBLIC_SEARCH_ENDPOINT:-https://search.lumilighting.co.ke}
+        - NEXT_PUBLIC_SEARCH_API_KEY=${NEXT_PUBLIC_SEARCH_API_KEY:-your_scoped_search_only_api_key}
+        - NEXT_PUBLIC_INDEX_NAME=${NEXT_PUBLIC_INDEX_NAME:-products}
+        - NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN:-https://8627c0a599066d97c041dafd2b5a588e@o4511094307749888.ingest.de.sentry.io/4511579456929872}
     container_name: lumi_prod_storefront
     restart: always
     depends_on:
-      - medusa-api
+      medusa-api:
+        condition: service_healthy
     environment:
       - MEDUSA_BACKEND_URL=http://medusa-api:9000
       - PORT=3010

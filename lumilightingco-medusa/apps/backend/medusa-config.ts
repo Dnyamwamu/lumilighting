@@ -13,10 +13,18 @@ module.exports = defineConfig({
       jwtSecret: process.env.JWT_SECRET || "supersecret",
       cookieSecret: process.env.COOKIE_SECRET || "supersecret",
     },
-    databaseDriverOptions: {
-      ssl: false,
-      sslmode: "disable",
-    },
+    databaseDriverOptions:
+      process.env.NODE_ENV === "production" &&
+      !process.env.DATABASE_URL?.includes("sslmode=disable")
+        ? {
+            ssl: {
+              rejectUnauthorized: false,
+            },
+          }
+        : {
+            ssl: false,
+            sslmode: "disable",
+          },
   },
   admin: {
     vite: (config) => {
@@ -38,7 +46,7 @@ module.exports = defineConfig({
   },
   modules: [
     {
-      resolve: "./modules/sanity",
+      resolve: "./src/modules/sanity",
       options: {
         api_token: process.env.SANITY_API_TOKEN,
         project_id: process.env.SANITY_PROJECT_ID,
@@ -128,6 +136,22 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/wishlist",
     },
+    ...(process.env.REDIS_URL
+      ? [
+          {
+            resolve: "@medusajs/medusa/event-bus-redis",
+            options: {
+              redisUrl: process.env.REDIS_URL,
+            },
+          },
+          {
+            resolve: "@medusajs/medusa/cache-redis",
+            options: {
+              redisUrl: process.env.REDIS_URL,
+            },
+          },
+        ]
+      : []),
   ],
 });
 

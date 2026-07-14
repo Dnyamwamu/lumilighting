@@ -16,17 +16,21 @@ echo "🏗️ Building storefront container..."
 docker compose -f docker-compose.prod.yml build storefront
 
 echo "🏗️ Building Medusa backend containers..."
-docker compose -f docker-compose.prod.yml build medusa-api
-docker compose -f docker-compose.prod.yml build medusa-worker
+docker compose -f docker-compose.prod.yml build --no-cache --progress=plain medusa-api
+docker compose -f docker-compose.prod.yml build --no-cache --progress=plain medusa-worker
 
 # 3. Start/Update containers
+echo "🌐 Checking external network dependency..."
+docker network inspect web_proxy >/dev/null 2>&1 || {
+  echo "🌐 Creating external network 'web_proxy'..."
+  docker network create web_proxy
+}
+
 echo "🚀 Starting updated production containers..."
 docker compose -f docker-compose.prod.yml up -d --remove-orphans
 
-# 4. Run database migrations inside the Medusa container
-# This ensures new schema changes are applied automatically without manual intervention.
-echo "🔄 Running database migrations..."
-docker compose -f docker-compose.prod.yml exec -T medusa-api pnpm --filter @dtc/backend exec medusa db:migrate
+# Note: Database migrations are automatically run by the 'medusa-api' container during its startup phase (in start.sh).
+# The 'medusa-worker' and 'storefront' containers wait until 'medusa-api' is healthy (migration finished) before starting.
 
 echo "=========================================="
 echo "✅ LUMI Deployment completed successfully!"

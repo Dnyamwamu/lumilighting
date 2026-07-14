@@ -13,6 +13,8 @@ RUN pnpm install --no-frozen-lockfile
 
 COPY . .
 
+ENV NODE_ENV=production
+
 RUN pnpm --filter @dtc/backend build
 
 EXPOSE 9000 5173 8000

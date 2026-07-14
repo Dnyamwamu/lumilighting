@@ -59,6 +59,8 @@ if [ "$NODE_ENV" = "production" ]; then
     echo "Starting Medusa production worker..."
     exec pnpm start --worker
   else
+    echo "Building Medusa admin panel for production..."
+    pnpm medusa build
     echo "Starting Medusa production server..."
     exec pnpm start
   fi
