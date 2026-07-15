@@ -13,11 +13,11 @@ git pull origin main
 
 # 2. Build production containers sequentially to prevent CPU/RAM exhaustion
 echo "🏗️ Building storefront container..."
-docker compose -f docker-compose.prod.yml build storefront
+docker compose --env-file ./lumilightingco/.env.production -f docker-compose.prod.yml build storefront
 
 echo "🏗️ Building Medusa backend containers..."
-docker compose -f docker-compose.prod.yml build --no-cache --progress=plain medusa-api
-docker compose -f docker-compose.prod.yml build --no-cache --progress=plain medusa-worker
+docker compose --env-file ./lumilightingco/.env.production -f docker-compose.prod.yml build --no-cache --progress=plain medusa-api
+docker compose --env-file ./lumilightingco/.env.production -f docker-compose.prod.yml build --no-cache --progress=plain medusa-worker
 
 # 3. Start/Update containers
 echo "🌐 Checking external network dependency..."
@@ -27,7 +27,7 @@ docker network inspect web_proxy >/dev/null 2>&1 || {
 }
 
 echo "🚀 Starting updated production containers..."
-docker compose -f docker-compose.prod.yml up -d --remove-orphans
+docker compose --env-file ./lumilightingco/.env.production -f docker-compose.prod.yml up -d --remove-orphans
 
 # Note: Database migrations are automatically run by the 'medusa-api' container during its startup phase (in start.sh).
 # The 'medusa-worker' and 'storefront' containers wait until 'medusa-api' is healthy (migration finished) before starting.
