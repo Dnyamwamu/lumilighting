@@ -42,6 +42,7 @@ services:
       - NODE_ENV=production
       - DATABASE_URL=postgres://${PROD_DB_USER:-lumi}:${PROD_DB_PASSWORD:-Lumilighting123!}@postgres:5432/medusa-store?sslmode=disable
       - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD:-LumiRedis123!}@redis:6379
+      - MEDUSA_WORKER_MODE=server
     env_file:
       - ./lumilightingco-medusa/apps/backend/.env.production
     expose:
@@ -74,6 +75,7 @@ services:
       - NODE_ENV=production
       - DATABASE_URL=postgres://${PROD_DB_USER:-lumi}:${PROD_DB_PASSWORD:-Lumilighting123!}@postgres:5432/medusa-store?sslmode=disable
       - REDIS_URL=redis://default:${PROD_REDIS_PASSWORD:-LumiRedis123!}@redis:6379
+      - MEDUSA_WORKER_MODE=worker
     env_file:
       - ./lumilightingco-medusa/apps/backend/.env.production
     command: --worker

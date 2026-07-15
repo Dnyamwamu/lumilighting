@@ -96,11 +96,11 @@ In production, run Medusa in two separate instances/containers:
 
 1. **API Server**: Handles HTTP request routing. Run with:
    ```bash
-   pnpm --filter @dtc/backend exec medusa start
+   MEDUSA_WORKER_MODE=server pnpm --filter @dtc/backend exec medusa start
    ```
 2. **Worker Server**: Handles event subscribers, email dispatching, QuickBooks syncs, and search index pushes. Run with:
    ```bash
-   pnpm --filter @dtc/backend exec medusa start --worker
+   MEDUSA_WORKER_MODE=worker pnpm --filter @dtc/backend exec medusa start
    ```
 
 ---

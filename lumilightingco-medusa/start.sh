@@ -58,9 +58,11 @@ if [ "$NODE_ENV" = "production" ]; then
   cd .medusa/server
   if [ "$IS_WORKER" = "true" ]; then
     echo "Starting Medusa production worker from .medusa/server..."
-    exec npx medusa start --worker
+    export MEDUSA_WORKER_MODE=worker
+    exec npx medusa start
   else
     echo "Starting Medusa production server from .medusa/server..."
+    export MEDUSA_WORKER_MODE=server
     exec npx medusa start
   fi
 else
