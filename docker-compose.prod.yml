@@ -117,9 +117,56 @@ services:
       - lumi_prod_network
       - web_proxy
 
+  # Admin Analytics Dashboard (CEO Portal)
+  admin-dashboard:
+    build:
+      context: ./lumilightingco-medusa
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+        - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+    container_name: lumi_prod_dashboard
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_started
+      medusa-api:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://${PROD_DB_USER:-lumi}:${PROD_DB_PASSWORD:-Lumilighting123!}@postgres:5432/medusa-store?sslmode=disable
+      - HOSTNAME=0.0.0.0
+      - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+    env_file:
+      - ./lumilightingco-medusa/apps/admin-dashboard/.env.production
+    command: sh -c "cd /server/apps/admin-dashboard && pnpm start"
+    expose:
+      - "3001"
+    networks:
+      - lumi_prod_network
+      - web_proxy
+
+  # Meilisearch
+  meilisearch:
+    image: getmeili/meilisearch:v1.12
+    container_name: lumi_prod_meilisearch
+    restart: always
+    environment:
+      - MEILI_ENV=production
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY:-your_production_meilisearch_master_key}
+    volumes:
+      - meilisearch_prod_data:/meili_data
+    expose:
+      - "7700"
+    networks:
+      - lumi_prod_network
+      - web_proxy
+
 volumes:
   postgres_prod_data:
   redis_prod_data:
+  meilisearch_prod_data:
 
 networks:
   lumi_prod_network:

@@ -18,6 +18,7 @@ docker compose --env-file ./lumilightingco/.env.production -f docker-compose.pro
 echo "🏗️ Building Medusa backend containers..."
 docker compose --env-file ./lumilightingco/.env.production -f docker-compose.prod.yml build --no-cache --progress=plain medusa-api
 docker compose --env-file ./lumilightingco/.env.production -f docker-compose.prod.yml build --no-cache --progress=plain medusa-worker
+docker compose --env-file ./lumilightingco/.env.production -f docker-compose.prod.yml build --no-cache --progress=plain admin-dashboard
 
 # 3. Start/Update containers
 echo "🌐 Checking external network dependency..."
