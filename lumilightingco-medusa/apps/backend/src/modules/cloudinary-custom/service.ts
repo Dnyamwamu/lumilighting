@@ -38,8 +38,21 @@ export class CloudinaryFileProviderService extends AbstractFileProviderService {
     const folder = this.config_.folderName || "medusa"
     const publicId = path.parse(file.filename).name
 
-    // Convert the base64 content to a Data URI, so Cloudinary decodes and processes it as binary data.
-    const dataUri = `data:${file.mimeType};base64,${file.content}`
+    // Medusa passes raw JSON/CSV string in file.content for imports, but base64 for images/binary files.
+    // We must ensure the content is properly base64-encoded to form a valid Data URI.
+    let base64Content = ""
+    if (Buffer.isBuffer(file.content)) {
+      base64Content = (file.content as Buffer).toString("base64")
+    } else {
+      const isBase64 = /^[A-Za-z0-9+/]*={0,2}$/.test(file.content.trim())
+      if (isBase64) {
+        base64Content = file.content
+      } else {
+        base64Content = Buffer.from(file.content, "utf8").toString("base64")
+      }
+    }
+
+    const dataUri = `data:${file.mimeType};base64,${base64Content}`
 
     return new Promise((resolve, reject) => {
       cloudinary.uploader.upload(
