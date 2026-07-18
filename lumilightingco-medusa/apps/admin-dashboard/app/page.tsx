@@ -5,6 +5,7 @@ import DashboardClient from "./DashboardClient";
 export const dynamic = "force-dynamic";
 
 async function ensureDataWarehouse() {
+  return; // Seeding disabled to show zero/empty figures
   try {
     // Check if daily_sales has any records
     const check = await query('SELECT COUNT(*)::integer as count FROM daily_sales');
@@ -121,56 +122,43 @@ export default async function Page() {
 
   // Initialize fallbacks
   let kpis = {
-    revenueToday: 145000,
-    ordersToday: 124,
-    revenueMonth: 2400000,
-    ordersMonth: 1240,
-    avgOrderValue: 4500,
-    productsSold: 840,
-    lowStock: 9,
-    pendingOrders: 14
+    revenueToday: 0,
+    ordersToday: 0,
+    revenueMonth: 0,
+    ordersMonth: 0,
+    avgOrderValue: 0,
+    productsSold: 0,
+    lowStock: 0,
+    pendingOrders: 0
   };
 
   let inventory = {
-    total_products: 84,
-    in_stock: 72,
-    out_of_stock: 3,
-    low_stock: 9
+    total_products: 0,
+    in_stock: 0,
+    out_of_stock: 0,
+    low_stock: 0
   };
 
-  let salesTrend = [
-    { month: "2026-01", revenue: 1850000, orders: 420 },
-    { month: "2026-02", revenue: 2100000, orders: 480 },
-    { month: "2026-03", revenue: 1950000, orders: 440 },
-    { month: "2026-04", revenue: 2400000, orders: 520 },
-    { month: "2026-05", revenue: 2850000, orders: 610 },
-    { month: "2026-06", revenue: 3100000, orders: 680 }
-  ];
+  let salesTrend: any[] = [];
 
-  let topProducts = [
-    { title: "LUMI LED Filament Bulb 4W", sold: 340, revenue: 289000 },
-    { title: "LUMI Track Light 12W Black", sold: 210, revenue: 504000 },
-    { title: "LUMI Premium Modern Chandelier", sold: 45, revenue: 2025000 },
-    { title: "LUMI Smart Wall Sconce Brass", sold: 124, revenue: 719200 },
-    { title: "LUMI Outdoor Floodlight 50W IP65", sold: 185, revenue: 703000 }
-  ];
+  let topProducts: any[] = [];
 
   let mpesaTransactions = [];
   let mpesaStats = {
-    total: 7,
-    success: 5,
-    failed: 2,
-    totalAmount: 66300,
-    successRate: 71.4
+    total: 0,
+    success: 0,
+    failed: 0,
+    totalAmount: 0,
+    successRate: 0
   };
 
   let quickbooks = {
-    sales: 12450000,
-    expenses: 8120000,
-    profit: 4330000,
-    vatPayable: 420000,
-    accountsReceivable: 1850000,
-    isMock: true
+    sales: 0,
+    expenses: 0,
+    profit: 0,
+    vatPayable: 0,
+    accountsReceivable: 0,
+    isMock: false
   };
 
   // Run database queries with error safety
@@ -229,14 +217,14 @@ export default async function Page() {
     const ordMonth = monthRes.rows[0]?.orders_count || 0;
 
     kpis = {
-      revenueToday: revToday || 145000,
-      ordersToday: ordToday || 124,
-      revenueMonth: revMonth || 2400000,
-      ordersMonth: ordMonth || 1240,
-      avgOrderValue: (Number(avgValRes.rows[0]?.avg_value || 0) / 100) || 4500,
-      productsSold: prodSoldRes.rows[0]?.sold || 840,
+      revenueToday: revToday,
+      ordersToday: ordToday,
+      revenueMonth: revMonth,
+      ordersMonth: ordMonth,
+      avgOrderValue: (Number(avgValRes.rows[0]?.avg_value || 0) / 100),
+      productsSold: prodSoldRes.rows[0]?.sold || 0,
       lowStock: inventory.low_stock,
-      pendingOrders: pendingRes.rows[0]?.count || 14
+      pendingOrders: pendingRes.rows[0]?.count || 0
     };
 
     // Query Sales Trend for charts

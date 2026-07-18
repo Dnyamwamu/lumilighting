@@ -173,11 +173,11 @@ export async function fetchQuickBooksFinancials(): Promise<QuickBooksFinancials>
 
     // Default fallbacks if parsing resulted in zeros but API succeeded
     return {
-      sales: sales || 12450000,
-      expenses: expenses || 8120000,
-      profit: profit || (sales ? sales - expenses : 4330000),
-      vatPayable: vatPayable || 420000,
-      accountsReceivable: accountsReceivable || 1850000,
+      sales: sales || 0,
+      expenses: expenses || 0,
+      profit: profit || (sales - expenses),
+      vatPayable: vatPayable || 0,
+      accountsReceivable: accountsReceivable || 0,
       isMock: false,
     };
   } catch (err) {
@@ -188,11 +188,11 @@ export async function fetchQuickBooksFinancials(): Promise<QuickBooksFinancials>
 
 function getMockFinancials(): QuickBooksFinancials {
   return {
-    sales: 12450000,          // KES 12.45M
-    expenses: 8120000,         // KES 8.12M
-    profit: 4330000,           // KES 4.33M
-    vatPayable: 420000,        // KES 420K
-    accountsReceivable: 1850000, // KES 1.85M
-    isMock: true,
+    sales: 0,
+    expenses: 0,
+    profit: 0,
+    vatPayable: 0,
+    accountsReceivable: 0,
+    isMock: false,
   };
 }
