@@ -552,3 +552,92 @@ Below is the configuration checklist for setting up the Proxy Hosts in the Nginx
 3. Click **Save**.
 
 _Note: Nginx Proxy Manager handles Let's Encrypt certificate renewals and Nginx configuration reloads dynamically, keeping the host ports `80` and `443` free from conflicts._
+
+---
+
+## 📦 9. Database Sync & Catalog Migration (Categories, Collections, Products)
+
+When launching or syncing your production store catalog, you must migrate your categories, collections, and products. Due to constraints and relational dependencies in Medusa v2, we sync **Categories & Collections** via clean SQL imports and **Products** via standard CSV import.
+
+### A. Migrating Categories & Collections (SQL Overwrite)
+Categories have circular parent-child constraints, and collections are linked in several joints. The easiest and safest way to overwrite production categories and collections is by executing our pre-formatted SQL scripts (`categories.sql` and `collections.sql`) directly against the production database container.
+
+These scripts automatically disable foreign-key checks temporarily, truncate/clear existing records, insert the data, and re-enable triggers.
+
+On your production server:
+```bash
+# 1. Import Categories
+docker exec -i lumi_prod_postgres psql -U ${PROD_DB_USER:-lumi} -d medusa-store < categories.sql
+
+# 2. Import Collections
+docker exec -i lumi_prod_postgres psql -U ${PROD_DB_USER:-lumi} -d medusa-store < collections.sql
+```
+
+*Note: If you ever need to regenerate these SQL dump files locally, run:*
+```bash
+docker exec -i lumi_postgres pg_dump -U lumi -d medusa-store -t product_category --data-only --inserts > categories.sql
+docker exec -i lumi_postgres pg_dump -U lumi -d medusa-store -t product_collection --data-only --inserts > collections.sql
+```
+
+---
+
+### B. Migrating Products (Standard CSV Import)
+Products reside in over 15 database tables (variants, options, prices, images, etc.). We use Medusa's built-in Admin panel CSV importer because it correctly manages all related entities and maps them to your newly imported categories/collections.
+
+1. **Export from Local**: Trigger the product export in the local Medusa Admin feed and download the CSV.
+2. **Import to Production**: 
+   - Open your production Medusa Admin dashboard (`http://localhost:9001/app/products` or via your proxy URL).
+   - Go to **Products** and click **Import** in the top right.
+   - Upload the local CSV file.
+
+#### Overwriting vs. Creating New Products:
+* **To Overwrite Existing Products**: Leave the `Product ID` and `Variant ID` columns intact in the CSV. Medusa will search for matching IDs in production and update them with the CSV values.
+* **To Create New Products (No Overwrite)**: Delete the `Product ID` and `Variant ID` columns from the CSV. Ensure `Product Handles` and variant `SKUs` are unique (so they don't conflict with existing products).
+
+---
+
+### C. Alternative: Full Database Clone (Erase and Overwrite Everything)
+If you want your production database to be a **100% exact copy** of your local environment (overwriting all products, categories, collections, users, settings, and orders), perform a full database dump and restore.
+
+1. **Generate the dump locally**:
+   ```bash
+   docker exec -i lumi_postgres pg_dump -U lumi -d medusa-store > full_db.sql
+   ```
+2. **Restore on your production server**:
+   ```bash
+   # Drop and recreate the database to start fresh
+   docker exec -i lumi_prod_postgres psql -U ${PROD_DB_USER:-lumi} -d postgres -c "DROP DATABASE \"medusa-store\";"
+   docker exec -i lumi_prod_postgres psql -U ${PROD_DB_USER:-lumi} -d postgres -c "CREATE DATABASE \"medusa-store\";"
+
+   # Restore the full dump
+   docker exec -i lumi_prod_postgres psql -U ${PROD_DB_USER:-lumi} -d medusa-store < full_db.sql
+   ```
+
+---
+
+## 💾 10. Automated Daily Database Backups (Cron Job)
+
+To prevent data loss in production, we provide an automated daily database backup script ([backup-db.sh](file:///Users/dnyamwamu/projects/Clients/lumilightingco/backup-db.sh)). This script runs `pg_dump` inside the production Docker container, compresses it using gzip, saves it to the host, and rotates/deletes backups older than 7 days.
+
+### A. Setup instructions on the production server:
+
+1. **Upload the backup script** (`backup-db.sh`) to a directory on your server (e.g., `/home/ubuntu/scripts/backup-db.sh`).
+2. **Make the script executable**:
+   ```bash
+   chmod +x /home/ubuntu/scripts/backup-db.sh
+   ```
+3. **Configure the Cron Job**:
+   Open the crontab editor on your server:
+   ```bash
+   crontab -e
+   ```
+   Add the following line to run the backup daily at midnight (00:00) and redirect output to a log file:
+   ```cron
+   0 0 * * * /home/ubuntu/scripts/backup-db.sh >> /var/log/medusa-backup.log 2>&1
+   ```
+
+### B. Customizing Environment variables:
+By default, the script stores backups in `/var/backups/medusa`. You can customize the storage path by prefixing the cron job command with `BACKUP_DIR`:
+```cron
+0 0 * * * BACKUP_DIR="/mnt/backups/db" /home/ubuntu/scripts/backup-db.sh >> /var/log/medusa-backup.log 2>&1
+```
