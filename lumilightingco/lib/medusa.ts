@@ -188,7 +188,7 @@ export const medusa = {
       const orderEnv = process.env.NEXT_PUBLIC_COLLECTION_ORDER
       if (orderEnv) {
         const order = orderEnv.split(",").map(h => h.trim().toLowerCase())
-        res.collections.sort((a, b) => {
+        res.collections.sort((a: ProductCollection, b: ProductCollection) => {
           const aIndex = order.indexOf(a.handle?.toLowerCase() || "")
           const bIndex = order.indexOf(b.handle?.toLowerCase() || "")
           if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex
@@ -197,7 +197,7 @@ export const medusa = {
           return 0
         })
       } else {
-        res.collections.sort((a, b) => {
+        res.collections.sort((a: ProductCollection, b: ProductCollection) => {
           const aIsIndoor = a.handle?.toLowerCase().includes("indoor") || a.title?.toLowerCase().includes("indoor")
           const bIsIndoor = b.handle?.toLowerCase().includes("indoor") || b.title?.toLowerCase().includes("indoor")
           if (aIsIndoor && !bIsIndoor) return -1
