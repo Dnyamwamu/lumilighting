@@ -33,7 +33,6 @@ export const syncStep = createStep(
         fields: [
           "id",
           "title",
-          "sanity_product.*"
         ],
         filters,
         pagination: {
@@ -50,16 +49,16 @@ export const syncStep = createStep(
       try {
         await promiseAll(
           products.map(async (prod) => {
+            const before = await sanityModule.retrieve(prod.id);
             const after = await sanityModule.upsertSyncDocument(
               "product", 
               prod as unknown as ProductDTO
             );
   
             upsertMap.push({
-              // @ts-ignore
-              before: prod.sanity_product,
+              before,
               after
-            })
+            });
   
             return after
           }),
