@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # If a custom shell command is provided that is not a Medusa startup command, run it directly.
-if [ $# -gt 0 ] && [ "$1" != "start" ] && [ "$1" != "--worker" ] && [ "$1" != "pnpm" ]; then
+if [ $# -gt 0 ] && [ "$1" != "start" ] && [ "$1" != "--worker" ] && { [ "$1" != "pnpm" ] || [ "$2" = "--filter" ]; }; then
   echo "Executing custom command: $@"
   exec "$@"
 fi
