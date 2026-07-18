@@ -478,17 +478,17 @@ Instead of deploying a separate Nginx container (which would conflict with the e
 
 Below is the configuration checklist for setting up the Proxy Hosts in the Nginx Proxy Manager Admin interface:
 
-| Domain Name(s) | Scheme | Forward Hostname / IP | Forward Port | Key Options | SSL Setup |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `lumilighting.co.ke`<br>`www.lumilighting.co.ke` | `http` | `lumi_prod_storefront` | `3010` | • Block Common Exploits<br>• Websockets Support | • Request Let's Encrypt Certificate<br>• Force SSL<br>• HTTP/2 Support |
-| `api.lumilighting.co.ke` | `http` | `lumi_prod_api` | `9000` | • Block Common Exploits<br>• Websockets Support | • Request Let's Encrypt Certificate<br>• Force SSL<br>• HTTP/2 Support |
-| `admin.lumilighting.co.ke`<br>`dashboard.lumilighting.co.ke` | `http` | `lumi_prod_dashboard` | `3001` | • Block Common Exploits<br>• Websockets Support | • Request Let's Encrypt Certificate<br>• Force SSL<br>• HTTP/2 Support |
-| `search.lumilighting.co.ke` | `http` | `lumi_prod_meilisearch` | `7700` | • Block Common Exploits | • Request Let's Encrypt Certificate<br>• Force SSL<br>• HTTP/2 Support |
+| Domain Name(s)                                               | Scheme | Forward Hostname / IP   | Forward Port | Key Options                                     | SSL Setup                                                              |
+| :----------------------------------------------------------- | :----- | :---------------------- | :----------- | :---------------------------------------------- | :--------------------------------------------------------------------- |
+| `lumilighting.co.ke`<br>`www.lumilighting.co.ke`             | `http` | `lumi_prod_storefront`  | `3010`       | • Block Common Exploits<br>• Websockets Support | • Request Let's Encrypt Certificate<br>• Force SSL<br>• HTTP/2 Support |
+| `api.lumilighting.co.ke`                                     | `http` | `lumi_prod_api`         | `9000`       | • Block Common Exploits<br>• Websockets Support | • Request Let's Encrypt Certificate<br>• Force SSL<br>• HTTP/2 Support |
+| `admin.lumilighting.co.ke`<br>`dashboard.lumilighting.co.ke` | `http` | `lumi_prod_dashboard`   | `3001`       | • Block Common Exploits<br>• Websockets Support | • Request Let's Encrypt Certificate<br>• Force SSL<br>• HTTP/2 Support |
+| `search.lumilighting.co.ke`                                  | `http` | `lumi_prod_meilisearch` | `7700`       | • Block Common Exploits                         | • Request Let's Encrypt Certificate<br>• Force SSL<br>• HTTP/2 Support |
 
 > [!IMPORTANT]
 > **Docker Network Hostname Resolution:**
 > The forward hostnames listed above (`lumi_prod_storefront`, `lumi_prod_api`, etc.) assume that Nginx Proxy Manager is running in a Docker container attached to the same user-defined network (e.g., `web_proxy`).
-> 
+>
 > If Nginx Proxy Manager is running directly on the host OS or in a different network environment, change the **Forward Hostname / IP** to the host loopback IP (`127.0.0.1` or the server's public IP) and ensure the corresponding ports (`3010`, `9000`, `3001`, `7700`) are mapped/bound to the host in `docker-compose.prod.yml`.
 
 ---
@@ -560,11 +560,13 @@ _Note: Nginx Proxy Manager handles Let's Encrypt certificate renewals and Nginx 
 When launching or syncing your production store catalog, you must migrate your categories, collections, and products. Due to constraints and relational dependencies in Medusa v2, we sync **Categories & Collections** via clean SQL imports and **Products** via standard CSV import.
 
 ### A. Migrating Categories & Collections (SQL Overwrite)
+
 Categories have circular parent-child constraints, and collections are linked in several joints. The easiest and safest way to overwrite production categories and collections is by executing our pre-formatted SQL scripts (`categories.sql` and `collections.sql`) directly against the production database container.
 
 These scripts automatically disable foreign-key checks temporarily, truncate/clear existing records, insert the data, and re-enable triggers.
 
 On your production server:
+
 ```bash
 # 1. Import Categories
 docker exec -i lumi_prod_postgres psql -U ${PROD_DB_USER:-lumi} -d medusa-store < categories.sql
@@ -573,7 +575,8 @@ docker exec -i lumi_prod_postgres psql -U ${PROD_DB_USER:-lumi} -d medusa-store 
 docker exec -i lumi_prod_postgres psql -U ${PROD_DB_USER:-lumi} -d medusa-store < collections.sql
 ```
 
-*Note: If you ever need to regenerate these SQL dump files locally, run:*
+_Note: If you ever need to regenerate these SQL dump files locally, run:_
+
 ```bash
 docker exec -i lumi_postgres pg_dump -U lumi -d medusa-store -t product_category --data-only --inserts > categories.sql
 docker exec -i lumi_postgres pg_dump -U lumi -d medusa-store -t product_collection --data-only --inserts > collections.sql
@@ -582,21 +585,24 @@ docker exec -i lumi_postgres pg_dump -U lumi -d medusa-store -t product_collecti
 ---
 
 ### B. Migrating Products (Standard CSV Import)
+
 Products reside in over 15 database tables (variants, options, prices, images, etc.). We use Medusa's built-in Admin panel CSV importer because it correctly manages all related entities and maps them to your newly imported categories/collections.
 
 1. **Export from Local**: Trigger the product export in the local Medusa Admin feed and download the CSV.
-2. **Import to Production**: 
+2. **Import to Production**:
    - Open your production Medusa Admin dashboard (`http://localhost:9001/app/products` or via your proxy URL).
    - Go to **Products** and click **Import** in the top right.
    - Upload the local CSV file.
 
 #### Overwriting vs. Creating New Products:
-* **To Overwrite Existing Products**: Leave the `Product ID` and `Variant ID` columns intact in the CSV. Medusa will search for matching IDs in production and update them with the CSV values.
-* **To Create New Products (No Overwrite)**: Delete the `Product ID` and `Variant ID` columns from the CSV. Ensure `Product Handles` and variant `SKUs` are unique (so they don't conflict with existing products).
+
+- **To Overwrite Existing Products**: Leave the `Product ID` and `Variant ID` columns intact in the CSV. Medusa will search for matching IDs in production and update them with the CSV values.
+- **To Create New Products (No Overwrite)**: Delete the `Product ID` and `Variant ID` columns from the CSV. Ensure `Product Handles` and variant `SKUs` are unique (so they don't conflict with existing products).
 
 ---
 
 ### C. Alternative: Full Database Clone (Erase and Overwrite Everything)
+
 If you want your production database to be a **100% exact copy** of your local environment (overwriting all products, categories, collections, users, settings, and orders), perform a full database dump and restore.
 
 1. **Generate the dump locally**:
@@ -604,6 +610,7 @@ If you want your production database to be a **100% exact copy** of your local e
    docker exec -i lumi_postgres pg_dump -U lumi -d medusa-store > full_db.sql
    ```
 2. **Restore on your production server**:
+
    ```bash
    # Drop and recreate the database to start fresh
    docker exec -i lumi_prod_postgres psql -U ${PROD_DB_USER:-lumi} -d postgres -c "DROP DATABASE \"medusa-store\";"
@@ -637,7 +644,13 @@ To prevent data loss in production, we provide an automated daily database backu
    ```
 
 ### B. Customizing Environment variables:
+
 By default, the script stores backups in `/var/backups/medusa`. You can customize the storage path by prefixing the cron job command with `BACKUP_DIR`:
+
 ```cron
 0 0 * * * BACKUP_DIR="/mnt/backups/db" /home/ubuntu/scripts/backup-db.sh >> /var/log/medusa-backup.log 2>&1
 ```
+
+### Restart Storefront and backend
+
+docker compose -f docker-compose.prod.yml --env-file ./lumilightingco/.env.production up -d --build storefront && docker compose -f docker-compose.prod.yml --env-file ./lumilightingco/.env.production restart medusa-api medusa-worker

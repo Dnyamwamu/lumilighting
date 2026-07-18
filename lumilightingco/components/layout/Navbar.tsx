@@ -440,14 +440,14 @@ export default function Navbar() {
         </div>
 
         {/* Row 2: Collections sub-nav */}
-        <div className="border-t border-border/30 bg-muted/5">
+        <div className="border-t border-border/10 bg-amber-500">
           <div className="mx-auto flex h-12 max-w-7xl items-center px-4 sm:px-6 lg:px-8 justify-center">
             <div className="flex items-center justify-start md:justify-center gap-6 overflow-x-auto scrollbar-none py-1 w-full">
               {/* Special "Shop All" link with Category Dropdown */}
               <div className="group relative shrink-0">
                 <a
                   href="/shop"
-                  className="flex items-center gap-1 py-2 text-xs font-bold text-amber-500 transition-colors hover:text-amber-600"
+                  className="flex items-center gap-1 py-2 text-xs font-black text-amber-950 transition-colors hover:text-amber-900"
                 >
                   Shop All
                 </a>
@@ -475,7 +475,7 @@ export default function Navbar() {
                 <div key={col.id} className="group relative shrink-0">
                   <a
                     href={`/shop?collection=${col.handle}`}
-                    className="flex items-center gap-1 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:text-primary"
+                    className="flex items-center gap-1 py-2 text-xs font-bold text-amber-950/80 transition-colors hover:text-amber-950"
                   >
                     {col.title}
                   </a>
