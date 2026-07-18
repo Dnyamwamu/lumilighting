@@ -183,7 +183,17 @@ export const medusa = {
 
   // Collections
   async getCollections(): Promise<{ collections: ProductCollection[] }> {
-    return medusaRequest("/store/collections", { next: { revalidate: 120 } })
+    const res = await medusaRequest("/store/collections", { next: { revalidate: 120 } })
+    if (res?.collections) {
+      res.collections.sort((a, b) => {
+        const aIsIndoor = a.handle?.toLowerCase().includes("indoor") || a.title?.toLowerCase().includes("indoor")
+        const bIsIndoor = b.handle?.toLowerCase().includes("indoor") || b.title?.toLowerCase().includes("indoor")
+        if (aIsIndoor && !bIsIndoor) return -1
+        if (!aIsIndoor && bIsIndoor) return 1
+        return 0
+      })
+    }
+    return res
   },
 
   // Carts
