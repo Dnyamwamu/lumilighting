@@ -20,6 +20,8 @@ ARG CLERK_SECRET_KEY
 ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY \
     CLERK_SECRET_KEY=$CLERK_SECRET_KEY
 
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 RUN pnpm --filter @dtc/backend build
 RUN pnpm --filter admin-dashboard build
 
