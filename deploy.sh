@@ -30,8 +30,13 @@ docker network inspect web_proxy >/dev/null 2>&1 || {
 echo "🚀 Starting updated production containers..."
 docker compose --env-file ./lumilightingco/.env.production -f docker-compose.prod.yml up -d --remove-orphans
 
-# Note: Database migrations are automatically run by the 'medusa-api' container during its startup phase (in start.sh).
-# The 'medusa-worker' and 'storefront' containers wait until 'medusa-api' is healthy (migration finished) before starting.
+# 4. Post-Deployment Resource Cleanup
+echo "🧹 Cleaning up unused build cache & dangling images..."
+docker image prune -f
+docker builder prune -f --until=24h
+
+echo "📊 Current Docker Disk Usage:"
+docker system df
 
 echo "=========================================="
 echo "✅ LUMI Deployment completed successfully!"
