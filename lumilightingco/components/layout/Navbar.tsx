@@ -310,18 +310,18 @@ export default function Navbar() {
         {/* Row 1: Logo & Branding, Top Nav Links, Actions */}
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg border border-amber-500/20 bg-muted">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="relative h-9 w-28 shrink-0">
               <Image
-                src="/lumi-lighting-co-logo.jpg"
+                src="/lumi-logo-yellow-shadow.png"
                 alt="LUMI Logo"
                 fill
-                className="object-cover"
+                className="object-contain drop-shadow-sm"
+                priority
               />
             </div>
-            <span className="bg-gradient-to-r from-foreground via-foreground/90 to-primary bg-clip-text text-xl font-bold tracking-tight text-transparent">
-              LUMI{" "}
-              <span className="font-medium text-amber-500">Lighting</span>
+            <span className="font-bold text-xs tracking-widest text-amber-500 uppercase">
+              Lighting
             </span>
           </Link>
 
@@ -778,26 +778,22 @@ export default function Navbar() {
 
       {/* Meilisearch Search Modal Overlay */}
       {isSearchOpen && (
-        <div className="fixed inset-0 z-50 flex animate-in items-start justify-center bg-background/70 p-4 pt-20 backdrop-blur-md duration-200 fade-in">
+        <div className="fixed inset-0 z-50 flex animate-in items-start justify-center bg-background/80 p-2 sm:p-4 pt-3 sm:pt-16 backdrop-blur-md duration-200 fade-in">
           <div
             className="absolute inset-0 bg-transparent"
             onClick={handleCloseSearch}
           />
-          <div className="relative flex max-h-[70vh] w-full max-w-2xl animate-in flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-2xl duration-200 zoom-in-95">
+          <div className="relative flex max-h-[90vh] sm:max-h-[80vh] w-full max-w-2xl animate-in flex-col overflow-hidden rounded-2xl sm:rounded-3xl border border-border/80 bg-card text-card-foreground shadow-2xl duration-200 zoom-in-95">
             {/* Input Header */}
-            <div className="relative flex shrink-0 h-14 items-center border-b border-border/80 bg-muted/5 pr-0 pl-4 overflow-hidden">
-              <div className="flex items-center h-full border-r border-border/60 shrink-0 pr-4 mr-2">
+            <div className="relative flex shrink-0 items-center border-b border-border/80 bg-muted/20 p-2 sm:p-3 gap-1.5 sm:gap-2 overflow-hidden">
+              {/* Category Select Pill */}
+              <div className="flex items-center shrink-0 rounded-xl border border-border/80 bg-background px-2 py-1.5 shadow-xs">
                 <select
                   value={searchCategory}
                   onChange={(e) => handleCategorySelect(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSearchSubmit()
-                    }
-                  }}
-                  className="bg-transparent pr-1 pl-1 py-1 text-xs font-bold text-amber-500 focus:outline-none cursor-pointer max-w-[120px] truncate"
+                  className="bg-transparent text-[11px] sm:text-xs font-bold text-amber-500 focus:outline-none cursor-pointer max-w-[80px] sm:max-w-[130px] truncate"
                 >
-                  <option value="" className="bg-background text-foreground font-sans">All Categories</option>
+                  <option value="" className="bg-background text-foreground font-sans">All</option>
                   {parentCategories.map((cat) => (
                     <option key={cat.id} value={cat.handle} className="bg-background text-foreground font-sans">
                       {cat.name}
@@ -806,57 +802,67 @@ export default function Navbar() {
                 </select>
               </div>
 
-              <Search className="h-5 w-5 text-muted-foreground ml-1 shrink-0" />
-              <input
-                type="text"
-                autoFocus
-                placeholder="Search lights, switches, bulbs..."
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleSearchSubmit()
-                  }
-                }}
-                className="w-full h-full border-0 bg-transparent py-2 pr-28 pl-2.5 text-base placeholder:text-muted-foreground/60 focus:ring-0 focus:outline-none"
-              />
-              {isSearchLoading ? (
-                <div className="absolute right-28 h-4 w-4 animate-spin rounded-full border-b-2 border-amber-500" />
-              ) : searchQuery ? (
-                <button
-                  onClick={() => {
-                    setSearchQuery("")
-                    setSearchResults([])
-                    setIsSearchLoading(false)
-                    if (searchTimeoutRef.current) {
-                      clearTimeout(searchTimeoutRef.current)
+              {/* Search Input Box */}
+              <div className="relative flex flex-1 items-center min-w-0 rounded-xl border border-border/80 bg-background px-2.5 py-1.5 focus-within:border-amber-500/50 focus-within:ring-2 focus-within:ring-amber-500/20">
+                <Search className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground shrink-0" />
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="Search lights, bulbs..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearchSubmit()
                     }
                   }}
-                  className="absolute right-28 cursor-pointer rounded-md p-1 text-muted-foreground hover:bg-muted"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              ) : (
-                <kbd className="absolute right-28 hidden items-center rounded border border-border/80 bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground/60 sm:inline-flex">
-                  ESC
-                </kbd>
-              )}
+                  className="w-full border-0 bg-transparent py-1 px-2 text-xs sm:text-base placeholder:text-muted-foreground/60 focus:outline-none text-foreground"
+                />
+                {isSearchLoading ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-b-2 border-amber-500 shrink-0" />
+                ) : searchQuery ? (
+                  <button
+                    onClick={() => {
+                      setSearchQuery("")
+                      setSearchResults([])
+                      setIsSearchLoading(false)
+                      if (searchTimeoutRef.current) {
+                        clearTimeout(searchTimeoutRef.current)
+                      }
+                    }}
+                    className="cursor-pointer rounded-md p-1 text-muted-foreground hover:bg-muted shrink-0"
+                    title="Clear search"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                ) : null}
+              </div>
 
+              {/* Search Submit Button */}
               <button
                 onClick={handleSearchSubmit}
-                className="h-full px-6 bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold text-sm uppercase tracking-wider transition-colors duration-200 shrink-0 flex items-center justify-center gap-1.5"
+                className="h-9 sm:h-10 px-3 sm:px-5 bg-amber-500 hover:bg-amber-600 active:scale-95 text-amber-950 font-bold text-xs sm:text-sm rounded-xl transition-all duration-200 shrink-0 flex items-center justify-center gap-1.5 shadow-sm"
               >
-                <Search className="h-4 w-4" />
-                Search
+                <Search className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Search</span>
+              </button>
+
+              {/* Close Modal Button */}
+              <button
+                onClick={handleCloseSearch}
+                className="cursor-pointer rounded-xl border border-border/80 bg-background p-2 text-muted-foreground hover:bg-muted hover:text-foreground shrink-0 shadow-xs"
+                title="Close modal"
+              >
+                <X className="h-4 w-4" />
               </button>
             </div>
 
             {/* Results / Content Area */}
-            <div className="flex-grow space-y-4 overflow-y-auto p-4">
+            <div className="flex-grow space-y-4 overflow-y-auto p-3 sm:p-4">
               {searchQuery.trim() === "" ? (
                 // Quick Links
                 <div className="space-y-3">
-                  <h3 className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                  <h3 className="text-[11px] sm:text-xs font-bold tracking-wider text-muted-foreground uppercase">
                     Popular Searches
                   </h3>
                   <div className="flex flex-wrap gap-2">
@@ -870,7 +876,7 @@ export default function Navbar() {
                       <button
                         key={term}
                         onClick={() => handleSearchChange(term)}
-                        className="cursor-pointer rounded-xl border border-border bg-muted/50 px-3.5 py-2 text-xs font-medium transition-all hover:border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-500"
+                        className="cursor-pointer rounded-xl border border-border/80 bg-muted/50 px-3 py-1.5 text-xs font-medium transition-all hover:border-amber-500/40 hover:bg-amber-500/10 hover:text-amber-500"
                       >
                         {term}
                       </button>
@@ -879,7 +885,7 @@ export default function Navbar() {
                 </div>
               ) : isSearchLoading && searchResults.length === 0 ? (
                 // Loading Spinner
-                <div className="space-y-2 py-12 text-center">
+                <div className="space-y-2 py-10 text-center">
                   <div className="mx-auto h-6 w-6 animate-spin rounded-full border-b-2 border-amber-500" />
                   <p className="text-xs text-muted-foreground">
                     Searching catalog...
@@ -888,58 +894,71 @@ export default function Navbar() {
               ) : filteredSearchResults.length > 0 ? (
                 // Hits List
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between border-b border-border/40 pb-2 text-xs text-muted-foreground">
+                  <div className="flex items-center justify-between border-b border-border/40 pb-2 text-[11px] sm:text-xs text-muted-foreground">
                     <span>Products Found ({filteredSearchResults.length})</span>
                     <a
                       href={`/shop?q=${encodeURIComponent(searchQuery)}${searchCategory ? `&category=${searchCategory}` : ""}`}
                       onClick={handleCloseSearch}
                       className="font-bold text-amber-500 hover:underline"
                     >
-                      View All in Shop
+                      View All in Shop &rarr;
                     </a>
                   </div>
                   <div className="grid grid-cols-1 gap-2">
-                    {filteredSearchResults.map((hit) => (
-                      <Link
-                        key={hit.id}
-                        href={`/product/${hit.handle}`}
-                        onClick={handleCloseSearch}
-                        className="flex items-center gap-4 rounded-xl border border-border/40 bg-muted/10 p-3 transition-all hover:border-amber-500/30 hover:bg-amber-500/5"
-                      >
-                        {/* Thumbnail */}
-                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-border/60 bg-muted/40">
-                          <Image
-                            src={
-                              hit.thumbnail || "/images/placeholder-light.jpg"
-                            }
-                            alt={hit.title}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        {/* Title and Category info */}
-                        <div className="min-w-0 flex-grow">
-                          <h4 className="truncate text-sm font-bold text-foreground">
-                            {hit.title}
-                          </h4>
-                          <div className="mt-0.5 flex items-center gap-1.5">
-                            {hit.categories && hit.categories.length > 0 && (
-                              <span className="rounded-md bg-muted px-1.5 py-0.5 text-[10px] font-bold text-muted-foreground">
-                                {hit.categories[0]?.name}
-                              </span>
-                            )}
-                            <p className="max-w-sm truncate text-xs text-muted-foreground">
-                              {hit.description}
-                            </p>
+                    {filteredSearchResults.map((hit) => {
+                      const priceObj = hit.variants?.[0]?.prices?.[0]
+                      const priceFormatted = priceObj
+                        ? new Intl.NumberFormat("en-KE", {
+                            style: "currency",
+                            currency: priceObj.currency_code || "KES",
+                            minimumFractionDigits: 0,
+                          }).format(priceObj.amount / 100)
+                        : null
+
+                      return (
+                        <Link
+                          key={hit.id}
+                          href={`/product/${hit.handle}`}
+                          onClick={handleCloseSearch}
+                          className="flex items-center gap-3 sm:gap-4 rounded-xl border border-border/40 bg-muted/10 p-2.5 sm:p-3 transition-all hover:border-amber-500/30 hover:bg-amber-500/5 group"
+                        >
+                          {/* Thumbnail */}
+                          <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-lg border border-border/60 bg-muted/40">
+                            <Image
+                              src={
+                                hit.thumbnail || "/images/placeholder-light.jpg"
+                              }
+                              alt={hit.title}
+                              fill
+                              className="object-cover transition-transform group-hover:scale-105"
+                            />
                           </div>
-                        </div>
-                      </Link>
-                    ))}
+                          {/* Title and Category info */}
+                          <div className="min-w-0 flex-grow">
+                            <h4 className="truncate text-xs sm:text-sm font-bold text-foreground group-hover:text-amber-500 transition-colors">
+                              {hit.title}
+                            </h4>
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                              {hit.categories && hit.categories.length > 0 && (
+                                <span className="rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 px-1.5 py-0.5 text-[10px] font-bold">
+                                  {hit.categories[0]?.name}
+                                </span>
+                              )}
+                              {priceFormatted && (
+                                <span className="text-xs font-extrabold text-foreground">
+                                  {priceFormatted}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      )
+                    })}
                   </div>
                 </div>
               ) : (
                 // Empty State
-                <div className="space-y-3 py-12 text-center">
+                <div className="space-y-3 py-10 text-center">
                   <Search className="mx-auto h-8 w-8 text-muted-foreground/30" />
                   <h4 className="text-sm font-bold">No results found</h4>
                   <p className="mx-auto max-w-xs text-xs text-muted-foreground">
@@ -951,20 +970,8 @@ export default function Navbar() {
             </div>
 
             {/* Footer hints */}
-            <div className="flex shrink-0 justify-between border-t border-border/60 bg-muted/20 px-4 py-2 text-[10px] text-muted-foreground">
+            <div className="flex shrink-0 items-center justify-between border-t border-border/60 bg-muted/20 px-4 py-2 text-[10px] text-muted-foreground">
               <span>
-                Press{" "}
-                <kbd className="rounded border border-border bg-background px-1 font-mono">
-                  Enter
-                </kbd>{" "}
-                to view all
-              </span>
-              <span className="hidden sm:inline">
-                Use{" "}
-                <kbd className="rounded border border-border bg-background px-1 font-mono">
-                  Tab
-                </kbd>{" "}
-                to navigate
               </span>
             </div>
           </div>

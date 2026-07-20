@@ -145,12 +145,12 @@ export default function HeroCarousel({
             >
               {/* Left Column: Text & CTAs */}
               <div className="text-center md:text-left lg:col-span-7">
-                <div className="relative mx-auto mb-5 h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-amber-500/30 bg-slate-900 shadow-lg shadow-amber-500/15 md:mx-0">
+                <div className="relative mx-auto mb-5 h-12 w-36 shrink-0 md:mx-0">
                   <Image
-                    src="/lumi-lighting-co-logo.jpg"
+                    src="/lumi-logo-yellow-shadow.png"
                     alt="LUMI Logo"
                     fill
-                    className="object-cover"
+                    className="object-contain drop-shadow-md"
                     priority
                   />
                 </div>

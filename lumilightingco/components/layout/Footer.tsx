@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react"
 import Link from "next/link"
-import { Lightbulb, Phone, Mail, MapPin, Clock } from "lucide-react"
+import Image from "next/image"
+import { Phone, Mail, MapPin, Clock } from "lucide-react"
 import { medusa } from "@/lib/medusa"
 
 export default function Footer() {
@@ -49,12 +50,16 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="space-y-6">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500">
-                <Lightbulb className="h-5 w-5" />
+              <div className="relative h-10 w-32 shrink-0">
+                <Image
+                  src="/lumi-logo-yellow-shadow.png"
+                  alt="LUMI Logo"
+                  fill
+                  className="object-contain"
+                />
               </div>
-              <span className="text-xl font-bold tracking-tight text-white">
-                LUMI{" "}
-                <span className="font-medium text-amber-500">Lighting Co.</span>
+              <span className="text-xs font-bold tracking-widest text-amber-500 uppercase">
+                Lighting
               </span>
             </Link>
             <p className="max-w-sm text-xs font-extrabold tracking-widest text-amber-500 uppercase">
@@ -147,7 +152,13 @@ export default function Footer() {
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-900 pt-8 md:flex-row">
           <p className="text-xs text-slate-500">
             &copy; {new Date().getFullYear()} LUMI Lighting. All rights
-            reserved. Built with Next.js, Medusa, and Sanity.
+            reserved. Built with care by{" "}
+            <Link
+              href="https://curlycraftsolutions.co.ke"
+              className="font-bold hover:text-amber-500"
+            >
+              CurlyCraft Solutions
+            </Link>
           </p>
           <div className="flex gap-6 text-xs text-slate-500">
             <Link href="/privacy" className="hover:text-amber-500">
