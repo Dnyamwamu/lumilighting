@@ -76,6 +76,17 @@ export default function ProductCard({ product }: ProductCardProps) {
         </span>
       )}
 
+      {/* Dynamic Product Badge */}
+      {product.metadata?.badge && (
+        <span
+          className={`absolute z-10 rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold tracking-wide text-white uppercase shadow-sm ${
+            hasDiscount ? "top-11 left-3" : "top-3 left-3"
+          }`}
+        >
+          {String(product.metadata.badge)}
+        </span>
+      )}
+
       {/* Wishlist Button */}
       <button
         type="button"

@@ -347,16 +347,7 @@ export default function Navbar() {
           </nav>
 
           {/* Action buttons (Auth, Cart, Mobile Menu toggle) */}
-          <div className="flex items-center gap-4">
-            {/* Search Trigger (Mobile/Tablet) */}
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className="cursor-pointer rounded-lg p-2 text-foreground transition-colors hover:bg-muted/50 sm:hidden"
-              aria-label="Search Catalog"
-            >
-              <Search className="h-5 w-5" />
-            </button>
-
+          <div className="flex items-center gap-3.5">
             {/* Theme Toggle */}
             <ThemeToggle />
 
@@ -439,10 +430,86 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Row 2: Collections sub-nav */}
+        {/* Row 2: Dedicated Meilisearch Bar (Visible on Mobile & Desktop) */}
+        <div className="border-t border-border/30 bg-muted/5 py-2.5 px-3 sm:px-6 sm:py-3">
+          <div className="mx-auto max-w-7xl flex items-center justify-center gap-2 sm:gap-3">
+            <div className="relative flex h-10 sm:h-11 items-center w-full max-w-3xl rounded-xl border border-border/50 bg-background/50 focus-within:border-amber-500 focus-within:bg-background focus-within:ring-1 focus-within:ring-amber-500 transition-all duration-300 overflow-hidden shadow-sm hover:border-border/80">
+              <div className="flex items-center h-full border-r border-border/40 shrink-0 bg-muted/5">
+                <select
+                  value={searchCategory}
+                  onChange={(e) => handleCategorySelect(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearchSubmit()
+                    }
+                  }}
+                  className="h-full bg-transparent pl-2.5 sm:pl-4 pr-1 text-[11px] sm:text-xs font-bold tracking-wider text-muted-foreground/80 hover:text-amber-500 focus:outline-none cursor-pointer max-w-[90px] sm:max-w-[140px] truncate"
+                >
+                  <option value="" className="bg-background text-foreground font-sans">All</option>
+                  {parentCategories.map((cat) => (
+                    <option key={cat.id} value={cat.handle} className="bg-background text-foreground font-sans">
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="relative flex-grow h-full flex items-center">
+                <input
+                  type="text"
+                  placeholder="Search lights, switches, bulbs..."
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onFocus={() => setIsSearchOpen(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearchSubmit()
+                    }
+                  }}
+                  className="w-full h-full bg-transparent pr-8 sm:pr-10 pl-8 sm:pl-10 text-xs sm:text-sm placeholder:text-muted-foreground/60 focus:outline-none"
+                />
+                <Search className="absolute left-2.5 sm:left-3.5 h-4 w-4 sm:h-4.5 sm:w-4.5 text-muted-foreground" />
+                {searchQuery && (
+                  <button
+                    onClick={() => handleSearchChange("")}
+                    className="absolute right-2.5 sm:right-3.5 rounded p-0.5 text-muted-foreground hover:bg-muted"
+                  >
+                    <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  </button>
+                )}
+              </div>
+
+              <button
+                onClick={handleSearchSubmit}
+                className="h-full px-3.5 sm:px-5 bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold text-[11px] sm:text-xs uppercase tracking-wider transition-colors duration-200 shrink-0 flex items-center justify-center gap-1"
+              >
+                <Search className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Search</span>
+              </button>
+            </div>
+
+            {/* Clear Filters Button */}
+            {(searchQuery || searchCategory) && (
+              <button
+                onClick={() => {
+                  setSearchQuery("")
+                  setSearchCategory("")
+                  window.location.href = "/shop"
+                }}
+                className="h-10 sm:h-11 px-2.5 sm:px-4 cursor-pointer rounded-xl border border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground text-xs font-bold transition-all duration-200 shrink-0 flex items-center gap-1 shadow-sm hover:border-amber-500/30 hover:text-amber-500 animate-in slide-in-from-right-2 fade-in"
+                title="Clear all search filters"
+              >
+                <X className="h-3.5 w-3.5 text-amber-500 shrink-0" />
+                <span className="hidden sm:inline">Clear</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Row 3: Collections sub-nav */}
         <div className="border-t border-border/10 bg-amber-500">
-          <div className="mx-auto flex h-12 max-w-7xl items-center px-4 sm:px-6 lg:px-8 justify-center">
-            <div className="flex items-center justify-start md:justify-center gap-6 overflow-x-auto scrollbar-none py-1 w-full">
+          <div className="mx-auto flex h-11 sm:h-12 max-w-7xl items-center px-4 sm:px-6 lg:px-8 justify-center">
+            <div className="flex items-center justify-start md:justify-center gap-5 sm:gap-6 overflow-x-auto scrollbar-none py-1 w-full">
               {/* Special "Shop All" link with Category Dropdown */}
               <div className="group relative shrink-0">
                 <a
@@ -475,9 +542,14 @@ export default function Navbar() {
                 <div key={col.id} className="group relative shrink-0">
                   <a
                     href={`/shop?collection=${col.handle}`}
-                    className="flex items-center gap-1 py-2 text-xs font-bold text-amber-950/80 transition-colors hover:text-amber-950"
+                    className="flex items-center gap-1.5 py-2 text-xs font-bold text-amber-950/80 transition-colors hover:text-amber-950"
                   >
-                    {col.title}
+                    <span>{col.title}</span>
+                    {col.metadata?.badge && (
+                      <span className="rounded-full bg-red-600 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-white shadow-sm shrink-0">
+                        {String(col.metadata.badge)}
+                      </span>
+                    )}
                   </a>
                   <div className="absolute left-0 top-full z-50 hidden min-w-[220px] rounded-xl border border-border/80 bg-background/95 p-3.5 shadow-2xl backdrop-blur-md group-hover:block animate-in fade-in slide-in-from-top-1 duration-150">
                     <div className="mb-2 text-[10px] font-bold tracking-wider text-muted-foreground/60 uppercase px-2.5">
@@ -502,79 +574,16 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Row 3: Dedicated Meilisearch Bar (Prominent/Expansive) */}
-        <div className="border-t border-border/30 bg-muted/5 py-3 hidden sm:block">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-center gap-3">
-            <div className="relative flex h-11 items-center w-full max-w-3xl rounded-xl border border-border/50 bg-background/50 focus-within:border-amber-500 focus-within:bg-background focus-within:ring-1 focus-within:ring-amber-500 transition-all duration-300 overflow-hidden shadow-sm hover:border-border/80">
-              <div className="flex items-center h-full border-r border-border/40 shrink-0 bg-muted/5 pr-4">
-                <select
-                  value={searchCategory}
-                  onChange={(e) => handleCategorySelect(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSearchSubmit()
-                    }
-                  }}
-                  className="h-full bg-transparent pl-4 pr-1 text-xs font-bold tracking-wider text-muted-foreground/80 hover:text-amber-500 focus:outline-none cursor-pointer max-w-[140px] truncate"
-                >
-                  <option value="" className="bg-background text-foreground font-sans">All Categories</option>
-                  {parentCategories.map((cat) => (
-                    <option key={cat.id} value={cat.handle} className="bg-background text-foreground font-sans">
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="relative flex-grow h-full flex items-center">
-                <input
-                  type="text"
-                  placeholder="Search for lights, switches, smart bulbs, downlights..."
-                  value={searchQuery}
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                  onFocus={() => setIsSearchOpen(true)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSearchSubmit()
-                    }
-                  }}
-                  className="w-full h-full bg-transparent pr-10 pl-10 text-sm placeholder:text-muted-foreground/60 focus:outline-none"
-                />
-                <Search className="absolute left-3.5 h-4.5 w-4.5 text-muted-foreground" />
-                {searchQuery && (
-                  <button
-                    onClick={() => handleSearchChange("")}
-                    className="absolute right-3.5 rounded p-0.5 text-muted-foreground hover:bg-muted"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-
-              <button
-                onClick={handleSearchSubmit}
-                className="h-full px-5 bg-amber-500 hover:bg-amber-600 text-amber-950 font-bold text-xs uppercase tracking-wider transition-colors duration-200 shrink-0 flex items-center justify-center gap-1.5"
-              >
-                <Search className="h-3.5 w-3.5" />
-                Search
-              </button>
+        {/* Row 4: Product Tags sub-nav */}
+        <div className="border-t border-border/20 bg-background/50">
+          <div className="mx-auto flex h-9 sm:h-10 max-w-7xl items-center px-4 sm:px-6 lg:px-8 justify-center">
+            <div className="flex items-center justify-start md:justify-center gap-5 sm:gap-6 overflow-x-auto scrollbar-none py-1 w-full text-xs font-semibold text-muted-foreground/80">
+              <span className="text-[10px] font-bold tracking-wider text-muted-foreground/50 uppercase pr-1 select-none shrink-0">Quick Tags:</span>
+              <a href="/shop?tag=Featured" className="hover:text-amber-500 transition-colors flex items-center gap-1 shrink-0">★ Featured</a>
+              <a href="/shop?tag=Best+Seller" className="hover:text-amber-500 transition-colors flex items-center gap-1 shrink-0">🔥 Best Sellers</a>
+              <a href="/shop?tag=New+Arrival" className="hover:text-amber-500 transition-colors flex items-center gap-1 shrink-0">✨ New Arrivals</a>
+              <a href="/shop?tag=Trending" className="hover:text-amber-500 transition-colors flex items-center gap-1 shrink-0">⚡ Trending</a>
             </div>
-
-            {/* Clear Filters Button */}
-            {(searchQuery || searchCategory) && (
-              <button
-                onClick={() => {
-                  setSearchQuery("")
-                  setSearchCategory("")
-                  window.location.href = "/shop"
-                }}
-                className="h-11 px-4 cursor-pointer rounded-xl border border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground text-xs font-bold transition-all duration-200 shrink-0 flex items-center gap-1.5 shadow-sm hover:border-amber-500/30 hover:text-amber-500 animate-in slide-in-from-right-2 fade-in"
-                title="Clear all search filters"
-              >
-                <X className="h-4 w-4 text-amber-500 shrink-0" />
-                Clear Filters
-              </button>
-            )}
           </div>
         </div>
 
@@ -601,6 +610,43 @@ export default function Navbar() {
                   </Link>
                 )
               })}
+
+              {/* Mobile Tags Navigation */}
+              <div className="flex flex-col gap-1.5 border-t border-border/40 pt-4 mb-2">
+                <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase mb-1">
+                  Browse by Tag
+                </span>
+                <div className="flex flex-wrap gap-2 py-1">
+                  <a
+                    href="/shop?tag=Featured"
+                    onClick={() => setIsOpen(false)}
+                    className="rounded-lg border border-border/60 bg-muted/30 px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:border-amber-500 hover:text-amber-500 transition-all flex items-center gap-1"
+                  >
+                    ★ Featured
+                  </a>
+                  <a
+                    href="/shop?tag=Best+Seller"
+                    onClick={() => setIsOpen(false)}
+                    className="rounded-lg border border-border/60 bg-muted/30 px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:border-amber-500 hover:text-amber-500 transition-all flex items-center gap-1"
+                  >
+                    🔥 Best Sellers
+                  </a>
+                  <a
+                    href="/shop?tag=New+Arrival"
+                    onClick={() => setIsOpen(false)}
+                    className="rounded-lg border border-border/60 bg-muted/30 px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:border-amber-500 hover:text-amber-500 transition-all flex items-center gap-1"
+                  >
+                    ✨ New Arrivals
+                  </a>
+                  <a
+                    href="/shop?tag=Trending"
+                    onClick={() => setIsOpen(false)}
+                    className="rounded-lg border border-border/60 bg-muted/30 px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:border-amber-500 hover:text-amber-500 transition-all flex items-center gap-1"
+                  >
+                    ⚡ Trending
+                  </a>
+                </div>
+              </div>
 
               {/* Mobile Collections and Categories */}
               <div className="flex flex-col gap-1 border-t border-border/40 pt-4">
@@ -658,7 +704,14 @@ export default function Navbar() {
                       }
                       className="flex w-full items-center justify-between py-1.5 text-sm font-medium text-foreground transition-colors"
                     >
-                      <span className="text-xs font-semibold">{col.title}</span>
+                      <span className="flex items-center gap-1.5 text-xs font-semibold">
+                        <span>{col.title}</span>
+                        {col.metadata?.badge && (
+                          <span className="rounded-full bg-red-600 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-white shrink-0">
+                            {String(col.metadata.badge)}
+                          </span>
+                        )}
+                      </span>
                       <span className="text-[10px] font-bold text-amber-500">
                         {activeMobileAccordion === col.id ? "Hide" : "Show"}
                       </span>

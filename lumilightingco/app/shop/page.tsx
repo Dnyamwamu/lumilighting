@@ -95,6 +95,7 @@ function ShopContent() {
   const queryParam = searchParams.get("q") || ""
   const categoryParam = searchParams.get("category") || ""
   const collectionParam = searchParams.get("collection") || ""
+  const tagParam = searchParams.get("tag") || ""
 
   const [products, setProducts] = useState<Product[]>([])
   const [liveCategories, setLiveCategories] = useState<ProductCategory[]>([])
@@ -103,6 +104,7 @@ function ShopContent() {
   const [searchQuery, setSearchQuery] = useState(queryParam)
   const [selectedCategory, setSelectedCategory] = useState(categoryParam)
   const [selectedCollection, setSelectedCollection] = useState(collectionParam)
+  const [selectedTag, setSelectedTag] = useState(tagParam)
   const [priceRange, setPriceRange] = useState<number>(50000)
   const [selectedBrand, setSelectedBrand] = useState("")
   const [sortBy, setSortBy] = useState("popular")
@@ -113,11 +115,11 @@ function ShopContent() {
   const [prevSearchQuery, setPrevSearchQuery] = useState(searchQuery)
 
   // Keep track of filter/search states to reset page count during render
-  const currentFiltersKey = `${searchQuery}|${selectedCategory}|${selectedCollection}|${selectedBrand}|${priceRange}|${sortBy}`
+  const currentFiltersKey = `${searchQuery}|${selectedCategory}|${selectedCollection}|${selectedTag}|${selectedBrand}|${priceRange}|${sortBy}`
   const [prevFiltersKey, setPrevFiltersKey] = useState(currentFiltersKey)
 
   // Keep track of the previous parameters as a single object to sync URL to state during render
-  const currentParamsKey = `${queryParam}|${categoryParam}|${collectionParam}`
+  const currentParamsKey = `${queryParam}|${categoryParam}|${collectionParam}|${tagParam}`
   const [prevParamsKey, setPrevParamsKey] = useState(currentParamsKey)
 
   if (currentParamsKey !== prevParamsKey) {
@@ -125,6 +127,7 @@ function ShopContent() {
     setSearchQuery(queryParam)
     setSelectedCategory(categoryParam)
     setSelectedCollection(collectionParam)
+    setSelectedTag(tagParam)
     
     // Always reset other filters (brand, price, sorting) to start fresh when primary URL parameters change
     setSelectedBrand("")
@@ -327,6 +330,16 @@ function ShopContent() {
       }
     }
 
+    // Tag / Badge
+    if (selectedTag) {
+      const lowerTag = selectedTag.toLowerCase().trim()
+      result = result.filter((p) => {
+        const badge = String(p.metadata?.badge || "").toLowerCase().trim()
+        const hasTag = p.tags?.some((t) => t.value.toLowerCase().trim() === lowerTag)
+        return badge === lowerTag || hasTag
+      })
+    }
+
     // Brand
     if (selectedBrand) {
       result = result.filter((p) => p.metadata?.brand === selectedBrand)
@@ -367,6 +380,7 @@ function ShopContent() {
     selectedCategoryHandles,
     selectedCollection,
     collections,
+    selectedTag,
     selectedBrand,
     priceRange,
     sortBy,
@@ -392,11 +406,13 @@ function ShopContent() {
         <div className="mb-8 flex flex-col items-start justify-between gap-4 border-b border-border/40 pb-6 md:flex-row md:items-end">
           <div className="space-y-1.5 max-w-3xl">
             <h1 className="text-3xl font-extrabold tracking-tight">
-              {activeCategory?.name || activeCollection?.title || "Store Showroom"}
+              {selectedTag ? `${selectedTag} Products` : (activeCategory?.name || activeCollection?.title || "Store Showroom")}
             </h1>
-            {(activeCategory?.description || activeCollection?.description) && (
+            {(selectedTag || activeCategory?.description || activeCollection?.description) && (
               <p className="text-sm text-muted-foreground/80 leading-relaxed">
-                {activeCategory?.description || activeCollection?.description}
+                {selectedTag
+                  ? `Browse our top-rated ${selectedTag.toLowerCase()} premium light fittings and fixtures.`
+                  : (activeCategory?.description || activeCollection?.description)}
               </p>
             )}
             <p className="text-xs font-semibold text-amber-500">
