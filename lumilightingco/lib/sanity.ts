@@ -128,7 +128,10 @@ export const sanityService = {
     )
   },
 
-  async getBlogPostBySlug(slug: string): Promise<BlogPost> {
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
+    if (!slug) {
+      return null
+    }
     return client.fetch(
       `*[_type == "blog" && slug.current == $slug][0] {
         _id,
