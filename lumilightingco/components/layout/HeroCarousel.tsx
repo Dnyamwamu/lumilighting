@@ -57,33 +57,33 @@ export default function HeroCarousel({
   const slides =
     initialSlides.length > 0
       ? initialSlides.map((slide, index) => {
-          const titleParts = slide.title.split(",")
-          const mainTitle = titleParts[0] + (titleParts.length > 1 ? "," : "")
-          const highlight = titleParts.slice(1).join(" ").trim()
+        const titleParts = slide.title.split(",")
+        const mainTitle = titleParts[0] + (titleParts.length > 1 ? "," : "")
+        const highlight = titleParts.slice(1).join(" ").trim()
 
-          let imageUrl = FALLBACK_SLIDES[index % FALLBACK_SLIDES.length].image
-          if (slide.backgroundImage) {
-            try {
-              const url = urlFor(slide.backgroundImage).url()
-              if (url) imageUrl = url
-            } catch (err) {
-              console.error("Failed to build image URL from Sanity:", err)
-            }
+        let imageUrl = FALLBACK_SLIDES[index % FALLBACK_SLIDES.length].image
+        if (slide.backgroundImage) {
+          try {
+            const url = urlFor(slide.backgroundImage).url()
+            if (url) imageUrl = url
+          } catch (err) {
+            console.error("Failed to build image URL from Sanity:", err)
           }
+        }
 
-          return {
-            id: slide._id || `sanity-slide-${index}`,
-            image: imageUrl,
-            badge: "Premium Architectural Lighting",
-            title: mainTitle,
-            highlight: highlight || undefined,
-            description:
-              slide.subtitle ||
-              "Experience the luxury showroom collection at LUMI Lighting. Our energy-efficient LED technology and high-end fixtures elevate any interior.",
-            ctaText: slide.ctaText || "Explore Showroom",
-            ctaLink: slide.ctaLink || "/shop",
-          }
-        })
+        return {
+          id: slide._id || `sanity-slide-${index}`,
+          image: imageUrl,
+          badge: "Premium Architectural Lighting",
+          title: mainTitle,
+          highlight: highlight || undefined,
+          description:
+            slide.subtitle ||
+            "Experience the luxury showroom collection at LUMI Lighting. Our energy-efficient LED technology and high-end fixtures elevate any interior.",
+          ctaText: slide.ctaText || "Explore Showroom",
+          ctaLink: slide.ctaLink || "/shop",
+        }
+      })
       : FALLBACK_SLIDES
 
   const prevSlide = (e: React.MouseEvent) => {
@@ -110,17 +110,15 @@ export default function HeroCarousel({
       {slides.map((slide, index) => (
         <div
           key={`bg-${slide.id}`}
-          className={`absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out ${
-            index === currentSlide ? "opacity-45" : "opacity-0 pointer-events-none"
-          }`}
+          className={`absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-45" : "opacity-0 pointer-events-none"
+            }`}
         >
           <Image
             src={slide.image}
             alt={`Lighting Background ${index + 1}`}
             fill
-            className={`object-cover filter blur-[2px] transition-transform duration-[6000ms] ease-out ${
-              index === currentSlide ? "scale-105" : "scale-100"
-            }`}
+            className={`object-cover filter blur-[2px] transition-transform duration-[6000ms] ease-out ${index === currentSlide ? "scale-105" : "scale-100"
+              }`}
             priority={index === 0}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-slate-950/50 md:to-slate-950/30" />
@@ -137,17 +135,16 @@ export default function HeroCarousel({
           {slides.map((slide, index) => (
             <div
               key={slide.id}
-              className={`w-full grid grid-cols-1 items-center gap-8 lg:grid-cols-12 transition-all duration-700 ease-in-out ${
-                index === currentSlide
+              className={`w-full grid grid-cols-1 items-center gap-8 lg:grid-cols-12 transition-all duration-700 ease-in-out ${index === currentSlide
                   ? "relative pointer-events-auto z-10 translate-y-0 opacity-100"
                   : "absolute inset-0 pointer-events-none z-0 translate-y-4 opacity-0"
-              }`}
+                }`}
             >
               {/* Left Column: Text & CTAs */}
               <div className="text-center md:text-left lg:col-span-7">
                 <div className="relative mx-auto mb-5 h-12 w-36 shrink-0 md:mx-0">
                   <Image
-                    src="/lumi-logo-yellow-shadow.png"
+                    src="/lumi-logo-yellow-clean.png"
                     alt="LUMI Logo"
                     fill
                     className="object-contain drop-shadow-md"
@@ -202,7 +199,7 @@ export default function HeroCarousel({
                       priority={index === 0}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
-                    
+
                     {/* Badge on image card */}
                     <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-slate-200">
                       <span className="rounded-lg bg-slate-950/80 px-2.5 py-1 font-semibold border border-white/10 backdrop-blur-md">
@@ -247,9 +244,8 @@ export default function HeroCarousel({
             <button
               key={`indicator-${s.id}`}
               onClick={() => setCurrentSlide(index)}
-              className={`group relative h-3 cursor-pointer rounded-full transition-all duration-300 ${
-                index === currentSlide ? "w-10 bg-amber-500" : "w-3 bg-slate-600 hover:bg-slate-400"
-              }`}
+              className={`group relative h-3 cursor-pointer rounded-full transition-all duration-300 ${index === currentSlide ? "w-10 bg-amber-500" : "w-3 bg-slate-600 hover:bg-slate-400"
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             >
               <span className="sr-only">Slide {index + 1}</span>

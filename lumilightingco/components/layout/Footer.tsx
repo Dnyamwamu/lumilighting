@@ -52,7 +52,7 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-2">
               <div className="relative h-10 w-32 shrink-0">
                 <Image
-                  src="/lumi-logo-yellow-shadow.png"
+                  src="/lumi-logo-yellow-clean.png"
                   alt="LUMI Logo"
                   fill
                   className="object-contain"

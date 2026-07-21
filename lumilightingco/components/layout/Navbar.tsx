@@ -281,7 +281,8 @@ export default function Navbar() {
       </Suspense>
       <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-md overflow-visible">
         {/* Scoped CSS for Illuminating Light Effect */}
-        <style dangerouslySetInnerHTML={{ __html: `
+        <style dangerouslySetInnerHTML={{
+          __html: `
           @keyframes headerGlow {
             0%, 100% {
               opacity: 0.55;
@@ -299,12 +300,12 @@ export default function Navbar() {
 
         {/* Top Glowing Edge Ray */}
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-amber-500/60 to-transparent pointer-events-none z-50" />
-        
+
         {/* Soft Radial Spotlight Halo */}
-        <div 
-          className="header-light-beam absolute top-0 left-1/2 -translate-x-1/2 w-[550px] h-[55px] pointer-events-none mix-blend-screen z-50 transition-all" 
-          style={{ 
-            backgroundImage: 'radial-gradient(ellipse at top, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.08) 35%, rgba(245, 158, 11, 0) 70%)' 
+        <div
+          className="header-light-beam absolute top-0 left-1/2 -translate-x-1/2 w-[550px] h-[55px] pointer-events-none mix-blend-screen z-50 transition-all"
+          style={{
+            backgroundImage: 'radial-gradient(ellipse at top, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.08) 35%, rgba(245, 158, 11, 0) 70%)'
           }}
         />
 
@@ -314,7 +315,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-2">
             <div className="relative h-9 w-28 shrink-0">
               <Image
-                src="/lumi-logo-yellow-shadow.png"
+                src="/lumi-logo-yellow-clean.png"
                 alt="LUMI Logo"
                 fill
                 className="object-contain drop-shadow-sm"
@@ -915,10 +916,10 @@ export default function Navbar() {
                       const priceObj = hit.variants?.[0]?.prices?.[0]
                       const priceFormatted = priceObj
                         ? new Intl.NumberFormat("en-KE", {
-                            style: "currency",
-                            currency: priceObj.currency_code || "KES",
-                            minimumFractionDigits: 0,
-                          }).format(priceObj.amount / 100)
+                          style: "currency",
+                          currency: priceObj.currency_code || "KES",
+                          minimumFractionDigits: 0,
+                        }).format(priceObj.amount / 100)
                         : null
 
                       return (

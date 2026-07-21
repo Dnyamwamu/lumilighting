@@ -3,60 +3,19 @@
 import React, { useState, useMemo } from "react"
 import { Search, ChevronDown, HelpCircle, RefreshCw } from "lucide-react"
 
-interface FAQ {
+export interface FAQ {
   _id: string
   question: string
   answer: string
   category: string
 }
 
-const MOCK_FAQS: FAQ[] = [
-  {
-    _id: "faq-1",
-    question: "What is your warranty policy?",
-    answer:
-      "All LUMI fixtures come with a minimum of 2-year showroom warranty covering any factory electrical defects or driver degradation.",
-    category: "Warranty",
-  },
-  {
-    _id: "faq-2",
-    question: "Do you deliver across Kenya?",
-    answer:
-      "Yes, we partner with reliable local courier networks to deliver order packages safely to Nairobi and all major towns in Kenya.",
-    category: "Shipping",
-  },
-  {
-    _id: "faq-3",
-    question: "Can I pay via M-Pesa?",
-    answer:
-      "Absolutely! We support direct Safaricom M-Pesa payments during checkout using STK Push prompts sent directly to your phone.",
-    category: "Payments",
-  },
-  {
-    _id: "faq-4",
-    question: "What is the Room Lighting Calculator?",
-    answer:
-      "Our Room Lighting Calculator is an interactive tool designed to estimate target light levels (Lux/Lumens) and suggest the best fixture wattages and quantities based on your custom room dimensions.",
-    category: "General",
-  },
-  {
-    _id: "faq-5",
-    question: "Do you offer layout design planning?",
-    answer:
-      "Yes, we provide complimentary lux calculations and lighting design layouts for architects, commercial developers, and home contractors.",
-    category: "General",
-  },
-]
-
 export default function FAQClient({ initialFaqs }: { initialFaqs: FAQ[] }) {
   const [searchQuery, setSearchQuery] = useState("")
   const [activeCategory, setActiveCategory] = useState("All")
   const [openId, setOpenId] = useState<string | null>(null)
 
-  // Combine Sanity FAQs with fallbacks if Sanity returned none
-  const faqs = useMemo(() => {
-    return initialFaqs.length > 0 ? initialFaqs : MOCK_FAQS
-  }, [initialFaqs])
+  const faqs = initialFaqs || []
 
   // Extract unique categories
   const categories = useMemo(() => {
@@ -92,8 +51,8 @@ export default function FAQClient({ initialFaqs }: { initialFaqs: FAQ[] }) {
           Frequently Asked Questions
         </h1>
         <p className="mx-auto max-w-lg text-sm text-muted-foreground">
-          Find answers regarding showroom warranties, delivery timelines,
-          payment callbacks, and luminary design advice.
+          Find answers regarding products, showroom location, delivery, warranties,
+          bulk ordering, and expert lighting advice.
         </p>
       </div>
 
