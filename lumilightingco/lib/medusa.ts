@@ -90,6 +90,7 @@ export interface ProductCategory {
   description?: string
   category_children?: ProductCategory[]
   product_category_images?: ProductCategoryImage[]
+  metadata?: Record<string, any>
 }
 
 export interface ProductCollection {
@@ -176,7 +177,7 @@ export const medusa = {
   // Categories
   async getCategories(): Promise<{ product_categories: ProductCategory[] }> {
     return medusaRequest(
-      "/store/product-categories?include_descendants_tree=true",
+      "/store/product-categories?include_descendants_tree=true&fields=*metadata,*product_category_images",
       { next: { revalidate: 120 } }
     )
   },

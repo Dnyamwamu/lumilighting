@@ -450,9 +450,9 @@ export default function Navbar() {
                       handleSearchSubmit()
                     }
                   }}
-                  className="h-full bg-transparent pl-2.5 sm:pl-4 pr-1 text-[11px] sm:text-xs font-bold tracking-wider text-muted-foreground/80 hover:text-amber-500 focus:outline-none cursor-pointer max-w-[90px] sm:max-w-[140px] truncate"
+                  className="h-full bg-transparent pl-2.5 sm:pl-4 pr-1 text-[11px] sm:text-xs font-bold tracking-wider text-muted-foreground/80 hover:text-amber-500 focus:outline-none cursor-pointer max-w-[100px] sm:max-w-[155px] truncate"
                 >
-                  <option value="" className="bg-background text-foreground font-sans">All</option>
+                  <option value="" className="bg-background text-foreground font-sans">All Categories</option>
                   {parentCategories.map((cat) => (
                     <option key={cat.id} value={cat.handle} className="bg-background text-foreground font-sans">
                       {cat.name}
@@ -803,9 +803,9 @@ export default function Navbar() {
                 <select
                   value={searchCategory}
                   onChange={(e) => handleCategorySelect(e.target.value)}
-                  className="bg-transparent text-[11px] sm:text-xs font-bold text-amber-500 focus:outline-none cursor-pointer max-w-[80px] sm:max-w-[130px] truncate"
+                  className="bg-transparent text-[11px] sm:text-xs font-bold text-amber-500 focus:outline-none cursor-pointer max-w-[95px] sm:max-w-[145px] truncate"
                 >
-                  <option value="" className="bg-background text-foreground font-sans">All</option>
+                  <option value="" className="bg-background text-foreground font-sans">All Categories</option>
                   {parentCategories.map((cat) => (
                     <option key={cat.id} value={cat.handle} className="bg-background text-foreground font-sans">
                       {cat.name}

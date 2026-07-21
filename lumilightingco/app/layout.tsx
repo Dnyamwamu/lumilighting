@@ -74,7 +74,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className="font-sans antialiased">
       <body className="pt-[4px]">
         {/* Top Illuminating Color Strip */}
-        <div className="fixed top-0 left-0 right-0 h-[4px] w-full z-50 illuminating-strip" />
+        <div className="fixed top-0 left-0 right-0 h-[4px] w-full z-50 illuminating-strip mb-2" />
         <ClerkProvider appearance={{ theme: shadcn }}>
           <ThemeProvider>
             <CartProvider>

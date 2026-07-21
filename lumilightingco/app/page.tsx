@@ -126,6 +126,24 @@ const DEFAULT_FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?auto=format&fit=crop&q=80&w=600"
 
 const getCategoryImageUrl = (category: ProductCategory) => {
+  // 1. Try to read from metadata.image or metadata.images
+  const metaImage = category.metadata?.image || category.metadata?.images
+  if (metaImage) {
+    if (typeof metaImage === "string") return metaImage
+    if (Array.isArray(metaImage) && metaImage.length > 0 && typeof metaImage[0] === "string") {
+      return metaImage[0]
+    }
+  }
+
+  // 2. Try to read from product_category_images returned by Medusa
+  if (category.product_category_images && category.product_category_images.length > 0) {
+    const primaryImg = category.product_category_images.find((img) => img.type === "thumbnail") || category.product_category_images[0]
+    if (primaryImg?.url) {
+      return primaryImg.url
+    }
+  }
+
+  // 3. Fallback to hardcoded map or default image
   return (
     FALLBACK_CATEGORY_IMAGES[category.handle] ||
     DEFAULT_FALLBACK_IMAGE
