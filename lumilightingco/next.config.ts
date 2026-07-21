@@ -1,7 +1,7 @@
 import type { NextConfig } from "next"
 import { withSentryConfig } from "@sentry/nextjs"
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   output: "standalone",
   typescript: {
     // We run type checking separately in the pipeline
@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     webpackBuildWorker: false,
+  },
+  sentry: {
+    disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+    disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
   },
   images: {
     remotePatterns: [
