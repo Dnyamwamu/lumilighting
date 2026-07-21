@@ -105,44 +105,75 @@ export default function HeroCarousel({
   }, [slides.length])
 
   return (
-    <section className="relative shrink-0 overflow-hidden bg-slate-950 py-16 text-white md:py-24 lg:py-28">
+    <section className="relative h-[650px] sm:h-[600px] lg:h-[660px] shrink-0 overflow-hidden bg-slate-950 text-white flex items-center">
       {/* Background Hero Slides */}
       {slides.map((slide, index) => (
         <div
           key={`bg-${slide.id}`}
-          className={`absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-45" : "opacity-0 pointer-events-none"
-            }`}
+          className={`absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out ${
+            index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
         >
-          <Image
-            src={slide.image}
-            alt={`Lighting Background ${index + 1}`}
-            fill
-            className={`object-cover filter blur-[2px] transition-transform duration-[6000ms] ease-out ${index === currentSlide ? "scale-105" : "scale-100"
+          {/* Desktop Diagonal Image Container */}
+          <div
+            className="absolute right-0 top-0 bottom-0 w-[58%] h-full z-0 overflow-hidden hidden lg:block animate-in fade-in duration-500"
+            style={{ clipPath: "polygon(14% 0, 100% 0, 100% 100%, 0% 100%)" }}
+          >
+            <Image
+              src={slide.image}
+              alt={slide.title}
+              fill
+              className={`object-cover transition-transform duration-[8000ms] ease-out ${
+                index === currentSlide ? "scale-105" : "scale-100"
               }`}
-            priority={index === 0}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/85 to-slate-950/50 md:to-slate-950/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/60" />
+              priority={index === 0}
+            />
+            {/* Soft gradient fade inside the cut */}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/20 to-transparent" />
+            {/* Glowing neon cut line */}
+            <div className="absolute left-[13.9%] top-0 bottom-0 w-[2px] bg-gradient-to-b from-amber-500 via-orange-500/80 to-amber-500/20 shadow-lg" />
+          </div>
+
+          {/* Mobile Background Image (Full Span) */}
+          <div className="absolute inset-0 w-full h-full z-0 lg:hidden">
+            <Image
+              src={slide.image}
+              alt={slide.title}
+              fill
+              className={`object-cover transition-transform duration-[8000ms] ease-out ${
+                index === currentSlide ? "scale-105" : "scale-100"
+              }`}
+              priority={index === 0}
+            />
+            <div className="absolute inset-0 bg-slate-950/85" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/60" />
+          </div>
+
+          {/* Left ambient dark background for text readability */}
+          <div className="absolute left-0 top-0 bottom-0 w-[45%] bg-slate-950 z-0 hidden lg:block" />
+          {/* Transition gradient between dark left and diagonal image */}
+          <div className="absolute left-[40%] top-0 bottom-0 w-[10%] bg-gradient-to-r from-slate-950 to-transparent z-0 hidden lg:block" />
         </div>
       ))}
 
       {/* Ambient background glow */}
-      <div className="absolute top-1/2 left-1/4 z-0 h-[350px] w-[350px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500/20 blur-[130px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/4 z-10 h-[350px] w-[350px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500/10 blur-[130px] pointer-events-none" />
 
       {/* Main Slide Content Container */}
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative min-h-[520px] sm:min-h-[460px] md:min-h-[420px] flex items-center">
+      <div className="relative z-20 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="relative min-h-[480px] sm:min-h-[420px] lg:min-h-[400px] flex items-center">
           {slides.map((slide, index) => (
             <div
               key={slide.id}
-              className={`w-full grid grid-cols-1 items-center gap-8 lg:grid-cols-12 transition-all duration-700 ease-in-out ${index === currentSlide
+              className={`w-full lg:max-w-xl transition-all duration-700 ease-in-out ${
+                index === currentSlide
                   ? "relative pointer-events-auto z-10 translate-y-0 opacity-100"
                   : "absolute inset-0 pointer-events-none z-0 translate-y-4 opacity-0"
-                }`}
+              }`}
             >
-              {/* Left Column: Text & CTAs */}
-              <div className="text-center md:text-left lg:col-span-7">
-                <div className="relative mx-auto mb-5 h-12 w-36 shrink-0 md:mx-0">
+              {/* Text & CTAs */}
+              <div className="text-center lg:text-left">
+                <div className="relative mx-auto lg:mx-0 mb-5 h-12 w-36 shrink-0">
                   <Image
                     src="/lumi-logo-yellow-clean.png"
                     alt="LUMI Logo"
@@ -151,11 +182,11 @@ export default function HeroCarousel({
                     priority
                   />
                 </div>
-                <div className="mb-4 inline-flex animate-pulse items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-400">
-                  <Sparkles className="h-3.5 w-3.5" />
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-400">
+                  <Sparkles className="h-3.5 w-3.5 animate-pulse" />
                   {slide.badge}
                 </div>
-                <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+                <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl leading-tight">
                   {slide.title}{" "}
                   {slide.highlight && (
                     <span className="bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">
@@ -163,10 +194,10 @@ export default function HeroCarousel({
                     </span>
                   )}
                 </h1>
-                <p className="mt-4 max-w-xl text-base sm:text-lg leading-relaxed text-slate-300 mx-auto md:mx-0">
+                <p className="mt-4 text-base sm:text-lg leading-relaxed text-slate-300 max-w-lg mx-auto lg:mx-0">
                   {slide.description}
                 </p>
-                <div className="mt-8 flex flex-wrap justify-center gap-4 md:justify-start">
+                <div className="mt-8 flex flex-wrap justify-center gap-4 lg:justify-start">
                   <Link href={slide.ctaLink}>
                     <Button
                       size="lg"
@@ -184,32 +215,6 @@ export default function HeroCarousel({
                       Room Calculator
                     </Button>
                   </Link>
-                </div>
-              </div>
-
-              {/* Right Column: Prominent Featured Image Card on Slider */}
-              <div className="relative mx-auto w-full max-w-md lg:col-span-5 lg:max-w-none">
-                <div className="group relative aspect-[4/3] sm:aspect-[16/10] lg:aspect-[4/3] w-full overflow-hidden rounded-3xl border border-amber-500/30 bg-slate-900/80 p-2.5 shadow-2xl shadow-amber-500/15 backdrop-blur-md transition-all duration-500 hover:border-amber-500/50">
-                  <div className="relative h-full w-full overflow-hidden rounded-2xl">
-                    <Image
-                      src={slide.image}
-                      alt={slide.title}
-                      fill
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                      priority={index === 0}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
-
-                    {/* Badge on image card */}
-                    <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-slate-200">
-                      <span className="rounded-lg bg-slate-950/80 px-2.5 py-1 font-semibold border border-white/10 backdrop-blur-md">
-                        {slide.badge}
-                      </span>
-                      <span className="rounded-lg bg-amber-500/90 text-white font-bold px-2.5 py-1 backdrop-blur-md">
-                        Slide {index + 1} / {slides.length}
-                      </span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
