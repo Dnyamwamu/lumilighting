@@ -3,22 +3,21 @@
 import React from "react"
 import { Search, SlidersHorizontal, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ProductCollection } from "@/lib/medusa"
 
 interface ShopFiltersProps {
   searchQuery: string
   setSearchQuery: (val: string) => void
   selectedCategory: string
   setSelectedCategory: (val: string) => void
-  selectedCollection?: string
-  setSelectedCollection?: (val: string) => void
+  selectedCollection: string
+  setSelectedCollection: (val: string) => void
   priceRange: number
   setPriceRange: (val: number) => void
-  selectedBrand: string
-  setSelectedBrand: (val: string) => void
   sortBy: string
   setSortBy: (val: string) => void
   categories: { name: string; handle: string; depth?: number }[]
-  brands: string[]
+  collections: ProductCollection[]
 }
 
 export default function ShopFilters({
@@ -30,12 +29,10 @@ export default function ShopFilters({
   setSelectedCollection,
   priceRange,
   setPriceRange,
-  selectedBrand,
-  setSelectedBrand,
   sortBy,
   setSortBy,
   categories,
-  brands,
+  collections,
 }: ShopFiltersProps) {
   return (
     <div className="space-y-6 rounded-xl border border-border bg-card p-5 text-card-foreground shadow-sm">
@@ -71,7 +68,7 @@ export default function ShopFilters({
         <label className="block text-xs font-bold tracking-wider text-muted-foreground uppercase">
           Categories
         </label>
-        <div className="flex flex-col gap-1.5 max-h-[320px] overflow-y-auto pr-1 custom-scrollbar">
+        <div className="flex flex-col gap-1.5 max-h-[220px] overflow-y-auto pr-1 custom-scrollbar">
           <button
             onClick={() => setSelectedCategory("")}
             className={`cursor-pointer rounded-lg px-2.5 py-1 text-left text-sm transition-colors ${
@@ -102,6 +99,38 @@ export default function ShopFilters({
         </div>
       </div>
 
+      {/* Collection Filter */}
+      <div className="space-y-2">
+        <label className="block text-xs font-bold tracking-wider text-muted-foreground uppercase">
+          Collections
+        </label>
+        <div className="flex flex-col gap-1.5 max-h-[180px] overflow-y-auto pr-1 custom-scrollbar">
+          <button
+            onClick={() => setSelectedCollection("")}
+            className={`cursor-pointer rounded-lg px-2.5 py-1 text-left text-sm transition-colors ${
+              selectedCollection === ""
+                ? "bg-amber-500 font-semibold text-white"
+                : "text-foreground hover:bg-muted/50"
+            }`}
+          >
+            All Collections
+          </button>
+          {collections.map((col) => (
+            <button
+              key={col.id}
+              onClick={() => setSelectedCollection(col.handle)}
+              className={`cursor-pointer rounded-lg px-2.5 py-1 text-left text-sm transition-colors ${
+                selectedCollection === col.handle
+                  ? "bg-amber-500 font-semibold text-white"
+                  : "text-foreground hover:bg-muted/50"
+              }`}
+            >
+              {col.title}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Price Range Filter */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
@@ -125,38 +154,6 @@ export default function ShopFilters({
           onChange={(e) => setPriceRange(parseInt(e.target.value))}
           className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-muted accent-amber-500"
         />
-      </div>
-
-      {/* Brand Filter */}
-      <div className="space-y-2">
-        <label className="block text-xs font-bold tracking-wider text-muted-foreground uppercase">
-          Brand
-        </label>
-        <div className="flex flex-col gap-1.5">
-          <button
-            onClick={() => setSelectedBrand("")}
-            className={`cursor-pointer rounded-lg px-2.5 py-1 text-left text-sm transition-colors ${
-              selectedBrand === ""
-                ? "bg-amber-500 font-semibold text-white"
-                : "text-foreground hover:bg-muted/50"
-            }`}
-          >
-            All Brands
-          </button>
-          {brands.map((brand) => (
-            <button
-              key={brand}
-              onClick={() => setSelectedBrand(brand)}
-              className={`cursor-pointer rounded-lg px-2.5 py-1 text-left text-sm transition-colors ${
-                selectedBrand === brand
-                  ? "bg-amber-500 font-semibold text-white"
-                  : "text-foreground hover:bg-muted/50"
-              }`}
-            >
-              {brand}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Sort By Filter */}
@@ -186,11 +183,8 @@ export default function ShopFilters({
         onClick={() => {
           setSearchQuery("")
           setSelectedCategory("")
-          if (setSelectedCollection) {
-            setSelectedCollection("")
-          }
+          setSelectedCollection("")
           setPriceRange(50000)
-          setSelectedBrand("")
           setSortBy("popular")
         }}
         className="w-full cursor-pointer border border-border text-xs text-muted-foreground hover:bg-muted/30 hover:text-foreground"

@@ -461,12 +461,10 @@ function ShopContent() {
               setSelectedCollection={setSelectedCollection}
               priceRange={priceRange}
               setPriceRange={setPriceRange}
-              selectedBrand={selectedBrand}
-              setSelectedBrand={setSelectedBrand}
               sortBy={sortBy}
               setSortBy={setSortBy}
               categories={flattenedCategories}
-              brands={BRANDS}
+              collections={collections}
             />
           </div>
 
@@ -496,12 +494,10 @@ function ShopContent() {
                   setSelectedCollection={setSelectedCollection}
                   priceRange={priceRange}
                   setPriceRange={setPriceRange}
-                  selectedBrand={selectedBrand}
-                  setSelectedBrand={setSelectedBrand}
                   sortBy={sortBy}
                   setSortBy={setSortBy}
                   categories={flattenedCategories}
-                  brands={BRANDS}
+                  collections={collections}
                 />
               </div>
             </div>
