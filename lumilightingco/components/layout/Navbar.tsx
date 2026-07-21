@@ -312,18 +312,23 @@ export default function Navbar() {
         {/* Row 1: Logo & Branding, Top Nav Links, Actions */}
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="relative h-9 w-28 shrink-0">
-              <Image
-                src="/lumi-logo-yellow-clean.png"
-                alt="LUMI Logo"
-                fill
-                className="object-contain drop-shadow-sm"
-                priority
-              />
+          <Link href="/" className="flex flex-col justify-center gap-0.5 group">
+            <div className="flex items-center gap-2">
+              <div className="relative h-9 w-28 shrink-0">
+                <Image
+                  src="/lumi-logo-yellow-clean.png"
+                  alt="LUMI Logo"
+                  fill
+                  className="object-contain drop-shadow-sm"
+                  priority
+                />
+              </div>
+              <span className="font-bold text-xs tracking-widest text-amber-500 uppercase">
+                Lighting
+              </span>
             </div>
-            <span className="font-bold text-xs tracking-widest text-amber-500 uppercase">
-              Lighting
+            <span className="hidden md:block text-[7px] sm:text-[8px] font-black tracking-widest text-muted-foreground/60 uppercase whitespace-nowrap pl-0.5 group-hover:text-amber-500 transition-colors">
+              Our Quality Marks The End Of The Tunnel.
             </span>
           </Link>
 
@@ -518,9 +523,9 @@ export default function Navbar() {
                   href="/shop"
                   aria-label="Shop All"
                   title="Shop All"
-                  className="flex items-center justify-center p-1.5 rounded-lg text-amber-950 hover:bg-amber-600/30 transition-colors"
+                  className="flex items-center justify-center h-8 w-8 rounded-full bg-white text-amber-500 hover:text-amber-600 hover:scale-105 shadow-sm transition-all"
                 >
-                  <Store className="h-4.5 w-4.5 stroke-[2.2]" />
+                  <Store className="h-4 w-4 stroke-[2.5]" />
                 </a>
                 <div className="absolute left-0 top-full z-50 hidden min-w-[220px] rounded-xl border border-border/80 bg-background/95 p-3.5 shadow-2xl backdrop-blur-md group-hover:block animate-in fade-in slide-in-from-top-1 duration-150">
                   <div className="mb-2 text-[10px] font-bold tracking-wider text-muted-foreground/60 uppercase px-2.5">

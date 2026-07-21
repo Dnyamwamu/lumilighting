@@ -135,3 +135,27 @@
     cursor: pointer;
   }
 }
+
+@keyframes colorGlow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.illuminating-strip {
+  background: linear-gradient(
+    90deg,
+    #ffcc00, /* Lumi Gold */
+    #f59e0b, /* Amber */
+    #ea580c, /* Orange */
+    #ec4899, /* Pink */
+    #f59e0b, /* Amber */
+    #ffcc00  /* Lumi Gold */
+  );
+  background-size: 400% 400%;
+  animation: colorGlow 12s ease-in-out infinite;
+  box-shadow: 0 1px 8px rgba(245, 158, 11, 0.3);
+}

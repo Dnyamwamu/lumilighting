@@ -31,6 +31,31 @@ export default function ProductCard({ product }: ProductCardProps) {
     return typeof selectedVariant?.inventory_quantity === "number" && selectedVariant.inventory_quantity <= 0
   }, [selectedVariant])
 
+  // Determine category name based on product categories or smart fallback from handle/title
+  const categoryName = React.useMemo(() => {
+    if (product.categories?.[0]?.name) {
+      return product.categories[0].name
+    }
+    
+    // Smart fallback detection based on handle & title
+    const searchString = `${product.handle} ${product.title}`.toLowerCase()
+    if (searchString.includes("bulb")) return "LED Bulbs"
+    if (searchString.includes("panel")) return "LED Panel Lights"
+    if (searchString.includes("chandelier")) return "Chandeliers"
+    if (searchString.includes("floodlight") || searchString.includes("flood")) return "Outdoor Floodlights"
+    if (searchString.includes("strip")) return "LED Strip Lights"
+    if (searchString.includes("solar")) return "Solar Solutions"
+    if (searchString.includes("switch") || searchString.includes("socket")) return "Switches & Sockets"
+    if (searchString.includes("pendant")) return "Pendant Lights"
+    if (searchString.includes("wall")) return "Wall Lights"
+    if (searchString.includes("ceiling")) return "Ceiling Lights"
+    if (searchString.includes("track")) return "Track Lights"
+    
+    return "LUMI Lighting"
+  }, [product.categories, product.handle, product.title])
+
+  const averageRating = product.metadata?.rating || product.metadata?.average_rating
+
   const priceObject = selectedVariant?.prices?.[0]
 
   const originalPrice = priceObject ? priceObject.amount / 100 : 0
@@ -115,41 +140,65 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Image container */}
       <Link
         href={`/product/${product.handle}`}
-        className="relative block aspect-square shrink-0 overflow-hidden bg-muted/40"
+        className="relative block aspect-square shrink-0 overflow-hidden bg-muted/20 p-3"
       >
-        <Image
-          src={thumbnail}
-          alt={product.title}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+        <div className="relative w-full h-full">
+          <Image
+            src={thumbnail}
+            alt={product.title}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-contain transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
       </Link>
 
       {/* Product info */}
       <div className="flex flex-grow flex-col p-4">
         <span className="mb-1 block text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
-          {product.categories?.[0]?.name || "LUMI Lighting"}
+          {categoryName}
         </span>
 
         <Link
           href={`/product/${product.handle}`}
           className="transition-colors group-hover:text-primary"
         >
-          <h3 className="line-clamp-2 min-h-[40px] text-sm leading-tight font-semibold">
+          <h3 className="line-clamp-3 min-h-[3.25rem] text-sm leading-snug font-semibold">
             {product.title}
           </h3>
         </Link>
 
         {/* Rating */}
-        <div className="mt-1 mb-2 flex items-center gap-1">
-          {[...Array(5)].map((_, i) => (
-            <Star
-              key={i}
-              className="h-3.5 w-3.5 fill-amber-400 text-amber-400"
-            />
-          ))}
-          <span className="ml-1 text-xs text-muted-foreground">(5.0)</span>
+        <div className="mt-1 mb-2 flex items-center gap-1 min-h-[20px]">
+          {averageRating ? (
+            <>
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`h-3.5 w-3.5 ${
+                    i < Math.round(Number(averageRating))
+                      ? "fill-amber-400 text-amber-400"
+                      : "text-muted-foreground/30"
+                  }`}
+                />
+              ))}
+              <span className="ml-1 text-xs text-muted-foreground">
+                ({Number(averageRating).toFixed(1)})
+              </span>
+            </>
+          ) : (
+            <>
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className="h-3.5 w-3.5 text-muted-foreground/20"
+                />
+              ))}
+              <span className="ml-1 text-[10px] text-muted-foreground/50">
+                (No reviews)
+              </span>
+            </>
+          )}
         </div>
 
         {/* Variant Selector (only if multiple variants exist) */}
@@ -191,7 +240,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             onClick={() => selectedVariant && addToCart(selectedVariant.id, 1)}
             disabled={!selectedVariant || isOutOfStock}
             size="sm"
-            className="w-full cursor-pointer gap-1 bg-slate-900 text-xs text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center"
+            className="w-full cursor-pointer gap-1 bg-slate-900 text-xs text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center dark:bg-orange-600 dark:hover:bg-orange-700"
           >
             <ShoppingCart className="h-3.5 w-3.5" />
             {isOutOfStock ? "Out of Stock" : "Cart"}

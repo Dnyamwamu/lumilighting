@@ -718,7 +718,7 @@ export default function ProductDetailPage() {
                 onClick={handleAddToCart}
                 disabled={!activeVariant || isOutOfStock || isAddingToCart}
                 size="lg"
-                className="h-12 flex-1 cursor-pointer gap-2 rounded-xl bg-slate-900 font-bold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center"
+                className="h-12 flex-1 cursor-pointer gap-2 rounded-xl bg-slate-900 font-bold text-white hover:bg-slate-800 disabled:opacity-50 flex items-center justify-center dark:bg-orange-600 dark:hover:bg-orange-700"
               >
                 {isAddingToCart ? (
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />

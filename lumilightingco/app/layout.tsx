@@ -16,8 +16,8 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_BASE_URL || "https://lumilighting.co.ke"
   ),
   title: {
-    default: "Lumi Lighting | Our Quality marks the end of the Tunnel",
-    template: "%s | Lumi Lighting",
+    default: "LUMI Lighting | Our Quality Marks The End Of The Tunnel",
+    template: "%s | LUMI Lighting",
   },
   description:
     "Transform your space with premium light fittings from Lumi Lighting. Shop high-quality LED panels, chandeliers, outdoor floodlights, and decorative bulbs in Nairobi, Kenya.",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Lumi Lighting" }],
   openGraph: {
-    title: "Lumi Lighting | Our Quality marks the end of the Tunnel",
+    title: "LUMI Lighting | Our Quality Marks The End Of The Tunnel",
     description:
       "Transform your space with premium light fittings from Lumi Lighting. Shop high-quality LED panels, chandeliers, outdoor floodlights, and decorative bulbs in Nairobi, Kenya.",
     url: "https://lumilighting.co.ke",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Lumi Lighting | Our Quality marks the end of the Tunnel",
+    title: "LUMI Lighting | Our Quality Marks The End Of The Tunnel",
     description:
       "Transform your space with premium light fittings from Lumi Lighting. Shop high-quality LED panels, chandeliers, outdoor floodlights, and decorative bulbs in Nairobi, Kenya.",
   },
@@ -72,7 +72,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="font-sans antialiased">
-      <body>
+      <body className="pt-[4px]">
+        {/* Top Illuminating Color Strip */}
+        <div className="fixed top-0 left-0 right-0 h-[4px] w-full z-50 illuminating-strip" />
         <ClerkProvider appearance={{ theme: shadcn }}>
           <ThemeProvider>
             <CartProvider>
