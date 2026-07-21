@@ -380,6 +380,29 @@ export default function ProductDetailPage() {
     )
   }
 
+  const categoryName = (() => {
+    if (!product) return ""
+    if (product.categories?.[0]?.name) {
+      return product.categories[0].name
+    }
+    
+    // Smart fallback detection based on handle & title
+    const searchString = `${product.handle} ${product.title}`.toLowerCase()
+    if (searchString.includes("bulb")) return "LED Bulbs"
+    if (searchString.includes("panel")) return "LED Panel Lights"
+    if (searchString.includes("chandelier")) return "Chandeliers"
+    if (searchString.includes("floodlight") || searchString.includes("flood")) return "Outdoor Floodlights"
+    if (searchString.includes("strip")) return "LED Strip Lights"
+    if (searchString.includes("solar")) return "Solar Solutions"
+    if (searchString.includes("switch") || searchString.includes("socket")) return "Switches & Sockets"
+    if (searchString.includes("pendant")) return "Pendant Lights"
+    if (searchString.includes("wall")) return "Wall Lights"
+    if (searchString.includes("ceiling")) return "Ceiling Lights"
+    if (searchString.includes("track")) return "Track Lights"
+    
+    return "LUMI Lighting"
+  })()
+
   const priceObject = activeVariant?.prices?.[0]
   const originalPrice = priceObject ? priceObject.amount / 100 : 0
   const discountRate = product.metadata?.discount_rate as number | undefined
@@ -581,7 +604,7 @@ export default function ProductDetailPage() {
           <div className="space-y-6">
             <div>
               <span className="mb-1 block text-xs font-bold tracking-wider text-amber-500 uppercase">
-                {product.categories?.[0]?.name || "LUMI Lighting"}
+                {categoryName}
               </span>
               <h1 className="text-3xl font-extrabold tracking-tight">
                 {product.title}
