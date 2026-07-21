@@ -21,6 +21,7 @@ import {
   Maximize2,
   ChevronLeft,
   Heart,
+  ArrowLeft,
 } from "lucide-react"
 import { useCart } from "@/context/CartContext"
 import { useWishlist } from "@/context/WishlistContext"
@@ -489,25 +490,41 @@ export default function ProductDetailPage() {
       <Navbar />
 
       <main className="mx-auto w-full max-w-7xl flex-grow px-4 py-8 sm:px-6 lg:px-8">
-        {/* Breadcrumbs */}
-        <div className="mb-8 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-          {breadcrumbItems.map((item, idx) => {
-            const isLast = idx === breadcrumbItems.length - 1
-            return (
-              <React.Fragment key={idx}>
-                {idx > 0 && <ChevronRight className="h-3.5 w-3.5 shrink-0" />}
-                {isLast || !item.href ? (
-                  <span className="truncate text-foreground font-semibold max-w-[200px]" title={item.name}>
-                    {item.name}
-                  </span>
-                ) : (
-                  <Link href={item.href} className="hover:text-amber-500 hover:underline transition-colors shrink-0">
-                    {item.name}
-                  </Link>
-                )}
-              </React.Fragment>
-            )
-          })}
+        {/* Back Button & Breadcrumbs */}
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/40 pb-4">
+          <button
+            onClick={() => {
+              if (typeof window !== "undefined" && document.referrer && document.referrer.includes(window.location.host)) {
+                window.history.back()
+              } else {
+                window.location.href = "/shop"
+              }
+            }}
+            className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-amber-500 transition-colors w-fit border border-border/60 hover:border-amber-500/50 bg-card hover:bg-amber-500/5 px-3 py-1.5 rounded-xl shadow-xs cursor-pointer"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+
+          <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+            {breadcrumbItems.map((item, idx) => {
+              const isLast = idx === breadcrumbItems.length - 1
+              return (
+                <React.Fragment key={idx}>
+                  {idx > 0 && <ChevronRight className="h-3.5 w-3.5 shrink-0" />}
+                  {isLast || !item.href ? (
+                    <span className="truncate text-foreground font-semibold max-w-[200px]" title={item.name}>
+                      {item.name}
+                    </span>
+                  ) : (
+                    <Link href={item.href} className="hover:text-amber-500 hover:underline transition-colors shrink-0">
+                      {item.name}
+                    </Link>
+                  )}
+                </React.Fragment>
+              )
+            })}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-2">
