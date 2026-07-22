@@ -361,7 +361,7 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary ${isActive
+                  className={`flex items-center gap-1.5 text-xs font-medium transition-colors hover:text-primary ${isActive
                     ? "mt-0.5 border-b-2 border-primary pb-1 text-primary"
                     : "text-muted-foreground"
                     }`}
