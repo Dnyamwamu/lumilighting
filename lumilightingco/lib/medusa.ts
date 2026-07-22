@@ -14,6 +14,9 @@ const headers = {
   "x-publishable-api-key": PUBLISHABLE_KEY,
 }
 
+const CART_FIELDS =
+  "*items,*region,*items.variant,*items.variant.product,*items.variant.product.images,*items.thumbnail,*items.metadata"
+
 interface MedusaRequestInit extends RequestInit {
   next?: {
     revalidate?: number | false
@@ -212,14 +215,14 @@ export const medusa = {
 
   // Carts
   async createCart(currencyCode = "kes"): Promise<{ cart: Cart }> {
-    return medusaRequest("/store/carts", {
+    return medusaRequest(`/store/carts?fields=${CART_FIELDS}`, {
       method: "POST",
       body: JSON.stringify({ currency_code: currencyCode }),
     })
   },
 
   async getCart(cartId: string): Promise<{ cart: Cart }> {
-    return medusaRequest(`/store/carts/${cartId}`, { cache: "no-store" })
+    return medusaRequest(`/store/carts/${cartId}?fields=${CART_FIELDS}`, { cache: "no-store" })
   },
 
   async addToCart(
@@ -227,7 +230,7 @@ export const medusa = {
     variantId: string,
     quantity = 1
   ): Promise<{ cart: Cart }> {
-    return medusaRequest(`/store/carts/${cartId}/line-items`, {
+    return medusaRequest(`/store/carts/${cartId}/line-items?fields=${CART_FIELDS}`, {
       method: "POST",
       body: JSON.stringify({ variant_id: variantId, quantity }),
     })
@@ -238,7 +241,7 @@ export const medusa = {
     itemId: string,
     quantity: number
   ): Promise<{ cart: Cart }> {
-    return medusaRequest(`/store/carts/${cartId}/line-items/${itemId}`, {
+    return medusaRequest(`/store/carts/${cartId}/line-items/${itemId}?fields=${CART_FIELDS}`, {
       method: "POST",
       body: JSON.stringify({ quantity }),
     })
@@ -280,7 +283,7 @@ export const medusa = {
     email: string,
     metadata?: Record<string, any>
   ): Promise<{ cart: Cart }> {
-    return medusaRequest(`/store/carts/${cartId}`, {
+    return medusaRequest(`/store/carts/${cartId}?fields=${CART_FIELDS}`, {
       method: "POST",
       body: JSON.stringify({
         billing_address: billingAddress,
@@ -292,14 +295,14 @@ export const medusa = {
   },
 
   async applyDiscount(cartId: string, code: string): Promise<{ cart: Cart }> {
-    return medusaRequest(`/store/carts/${cartId}/promotions`, {
+    return medusaRequest(`/store/carts/${cartId}/promotions?fields=${CART_FIELDS}`, {
       method: "POST",
       body: JSON.stringify({ promo_codes: [code] }),
     })
   },
 
   async removeDiscount(cartId: string, code: string): Promise<{ cart: Cart }> {
-    return medusaRequest(`/store/carts/${cartId}/promotions`, {
+    return medusaRequest(`/store/carts/${cartId}/promotions?fields=${CART_FIELDS}`, {
       method: "DELETE",
       body: JSON.stringify({ promo_codes: [code] }),
     })
@@ -318,7 +321,7 @@ export const medusa = {
     cartId: string,
     optionId: string
   ): Promise<{ cart: Cart }> {
-    return medusaRequest(`/store/carts/${cartId}/shipping-methods`, {
+    return medusaRequest(`/store/carts/${cartId}/shipping-methods?fields=${CART_FIELDS}`, {
       method: "POST",
       body: JSON.stringify({ option_id: optionId }),
     })
