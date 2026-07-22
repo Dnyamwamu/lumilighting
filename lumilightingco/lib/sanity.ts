@@ -60,7 +60,25 @@ export interface AboutContent {
   features?: { title: string; description: string }[]
 }
 
+export interface QuickTag {
+  _id: string
+  title: string
+  tagValue: string
+  icon?: string
+}
+
 export const sanityService = {
+  async getQuickTags(): Promise<QuickTag[]> {
+    return client.fetch(
+      `*[_type == "quickTag"] | order(order asc) {
+        _id,
+        title,
+        tagValue,
+        icon
+      }`
+    )
+  },
+
   async getHeroes(): Promise<HeroSlide[]> {
     return client.fetch(
       `*[_type == "hero"] | order(order asc) {

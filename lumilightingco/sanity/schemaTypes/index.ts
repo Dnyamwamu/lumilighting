@@ -5,7 +5,8 @@ import testimonial from "./testimonial"
 import faq from "./faq"
 import blog from "./blog"
 import about from "./about"
+import quickTag from "./quickTag"
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [hero, promo, testimonial, faq, blog, about],
+  types: [hero, promo, testimonial, faq, blog, about, quickTag],
 }

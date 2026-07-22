@@ -29,6 +29,7 @@ import CartDrawer from "../cart/CartDrawer"
 import { useCart } from "@/context/CartContext"
 import { useWishlist } from "@/context/WishlistContext"
 import { Product, ProductCategory, ProductCollection, medusa } from "@/lib/medusa"
+import { sanityService, type QuickTag } from "@/lib/sanity"
 
 function ThemeToggle() {
   const [mounted, setMounted] = useState(false)
@@ -97,14 +98,26 @@ export default function Navbar() {
   const [activeMobileAccordion, setActiveMobileAccordion] = useState<string | null>(null)
   const [liveCategories, setLiveCategories] = useState<ProductCategory[]>([])
   const [collections, setCollections] = useState<ProductCollection[]>([])
+  const [quickTags, setQuickTags] = useState<QuickTag[]>([])
   const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
+    const DEFAULT_QUICK_TAGS: QuickTag[] = [
+      { _id: "featured", title: "Featured", tagValue: "Featured", icon: "★" },
+      { _id: "best-sellers", title: "Best Sellers", tagValue: "Best Seller", icon: "🔥" },
+      { _id: "new-arrivals", title: "New Arrivals", tagValue: "New Arrival", icon: "✨" },
+      { _id: "trending", title: "Trending", tagValue: "Trending", icon: "⚡" },
+    ]
+
     async function fetchNavbarData() {
       try {
-        const [catRes, colRes] = await Promise.all([
+        const [catRes, colRes, tagsRes] = await Promise.all([
           medusa.getCategories(),
           medusa.getCollections(),
+          sanityService.getQuickTags().catch((err) => {
+            console.error("Failed to fetch sanity quick tags:", err)
+            return []
+          }),
         ])
         if (catRes?.product_categories) {
           setLiveCategories(catRes.product_categories)
@@ -112,8 +125,14 @@ export default function Navbar() {
         if (colRes?.collections) {
           setCollections(colRes.collections)
         }
+        if (tagsRes && tagsRes.length > 0) {
+          setQuickTags(tagsRes)
+        } else {
+          setQuickTags(DEFAULT_QUICK_TAGS)
+        }
       } catch (err) {
         console.error("Failed to fetch navbar categories/collections:", err)
+        setQuickTags(DEFAULT_QUICK_TAGS)
       }
     }
     fetchNavbarData()
@@ -585,14 +604,19 @@ export default function Navbar() {
         </div>
 
         {/* Row 4: Product Tags sub-nav */}
-        <div className="border-t border-border/20 bg-background/50">
+        <div className="border-t border-border/20 bg-gray-50">
           <div className="mx-auto flex h-9 sm:h-10 max-w-7xl items-center px-4 sm:px-6 lg:px-8 justify-center">
             <div className="flex items-center justify-start md:justify-center gap-5 sm:gap-6 overflow-x-auto scrollbar-none py-1 w-full text-xs font-semibold text-muted-foreground/80">
               <span className="text-[10px] font-bold tracking-wider text-muted-foreground/50 uppercase pr-1 select-none shrink-0">Quick Tags:</span>
-              <a href="/shop?tag=Featured" className="hover:text-amber-500 transition-colors flex items-center gap-1 shrink-0">★ Featured</a>
-              <a href="/shop?tag=Best+Seller" className="hover:text-amber-500 transition-colors flex items-center gap-1 shrink-0">🔥 Best Sellers</a>
-              <a href="/shop?tag=New+Arrival" className="hover:text-amber-500 transition-colors flex items-center gap-1 shrink-0">✨ New Arrivals</a>
-              <a href="/shop?tag=Trending" className="hover:text-amber-500 transition-colors flex items-center gap-1 shrink-0">⚡ Trending</a>
+              {quickTags.map((tag) => (
+                <Link
+                  key={tag._id}
+                  href={`/shop?tag=${encodeURIComponent(tag.tagValue)}`}
+                  className="hover:text-amber-500 transition-colors flex items-center gap-1 shrink-0"
+                >
+                  {tag.icon && <span>{tag.icon}</span>} {tag.title}
+                </Link>
+              ))}
             </div>
           </div>
         </div>
