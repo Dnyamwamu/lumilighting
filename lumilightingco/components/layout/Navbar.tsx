@@ -265,6 +265,7 @@ export default function Navbar() {
 
   const topNavLinks = [
     { name: "Home", href: "/", icon: Home },
+    { name: "Showroom", href: "/shop", icon: Sparkles },
     { name: "About Us", href: "/about", icon: Info },
     { name: "Blog & Guides", href: "/blog", icon: BookOpen },
     { name: "FAQs", href: "/faq", icon: HelpCircle },

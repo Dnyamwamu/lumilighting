@@ -202,7 +202,7 @@ export default async function Page() {
 
   // Filter collections that have products (natively linked or matching a product tag)
   const collectionsWithProducts = collections.map((col) => {
-    const colProducts = liveProducts.filter((p) => 
+    const colProducts = liveProducts.filter((p) =>
       p.collection_id === col.id ||
       p.tags?.some((t) => {
         const tagVal = t.value.toLowerCase().trim();
@@ -397,7 +397,7 @@ export default async function Page() {
           ))}
 
         {/* Lighting Calculator Preview */}
-        <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
+        {/* <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-8 overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 p-8 text-white shadow-xl md:flex-row md:p-12">
             <div className="max-w-md space-y-4">
               <span className="block text-xs font-bold tracking-wider text-amber-400 uppercase">
@@ -426,7 +426,7 @@ export default async function Page() {
               />
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Why Choose LUMI */}
         <section className="border-t border-border bg-muted/40 py-16">

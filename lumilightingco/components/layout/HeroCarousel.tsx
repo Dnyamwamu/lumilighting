@@ -110,9 +110,8 @@ export default function HeroCarousel({
       {slides.map((slide, index) => (
         <div
           key={`bg-${slide.id}`}
-          className={`absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out ${
-            index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+          className={`absolute inset-0 z-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
         >
           {/* Desktop Wave Image Container */}
           <div className="absolute right-0 top-0 bottom-0 w-[58%] h-full z-0 overflow-hidden hidden lg:block animate-in fade-in duration-500">
@@ -120,9 +119,8 @@ export default function HeroCarousel({
               src={slide.image}
               alt={slide.title}
               fill
-              className={`object-cover transition-transform duration-[8000ms] ease-out ${
-                index === currentSlide ? "scale-105" : "scale-100"
-              }`}
+              className={`object-cover transition-transform duration-[8000ms] ease-out ${index === currentSlide ? "scale-[1.02]" : "scale-100"
+                }`}
               priority={index === 0}
             />
             {/* Soft gradient fade inside the container */}
@@ -162,9 +160,8 @@ export default function HeroCarousel({
               src={slide.image}
               alt={slide.title}
               fill
-              className={`object-cover transition-transform duration-[8000ms] ease-out ${
-                index === currentSlide ? "scale-105" : "scale-100"
-              }`}
+              className={`object-cover transition-transform duration-[8000ms] ease-out ${index === currentSlide ? "scale-105" : "scale-100"
+                }`}
               priority={index === 0}
             />
             <div className="absolute inset-0 bg-slate-950/85" />
@@ -187,11 +184,10 @@ export default function HeroCarousel({
           {slides.map((slide, index) => (
             <div
               key={slide.id}
-              className={`w-full lg:max-w-xl transition-all duration-700 ease-in-out ${
-                index === currentSlide
+              className={`w-full lg:max-w-xl transition-all duration-700 ease-in-out ${index === currentSlide
                   ? "relative pointer-events-auto z-10 translate-y-0 opacity-100"
                   : "absolute inset-0 pointer-events-none z-0 translate-y-4 opacity-0"
-              }`}
+                }`}
             >
               {/* Text & CTAs */}
               <div className="text-center lg:text-left">
@@ -271,11 +267,10 @@ export default function HeroCarousel({
             <button
               key={`indicator-${s.id}`}
               onClick={() => setCurrentSlide(index)}
-              className={`group relative h-2.5 cursor-pointer rounded-full transition-all duration-300 ${
-                index === currentSlide 
-                  ? "w-8 bg-gradient-to-r from-amber-400 to-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" 
+              className={`group relative h-2.5 cursor-pointer rounded-full transition-all duration-300 ${index === currentSlide
+                  ? "w-8 bg-gradient-to-r from-amber-400 to-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
                   : "w-2.5 bg-slate-700 hover:bg-slate-500"
-              }`}
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             >
               <span className="sr-only">Slide {index + 1}</span>

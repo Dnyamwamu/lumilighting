@@ -142,7 +142,7 @@ export default function ContactPage() {
                     Quick assistance via chat.
                   </p>
                   <a
-                    href="https://wa.me/254729686414?text=Hello%20LUMI%20Lighting%2C%20please%20assist%20me%20with%20an%20order."
+                    href="https://wa.me/254706504644?text=Hello%20LUMI%20Lighting%2C%20please%20assist%20me%20with%20an%20order."
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-1 block text-xs font-bold text-amber-500 hover:underline"

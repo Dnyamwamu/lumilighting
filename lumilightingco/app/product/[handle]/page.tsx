@@ -182,8 +182,8 @@ export default function ProductDetailPage() {
         setProduct(mergedProduct)
         setActiveImage(
           mergedProduct.thumbnail ||
-            mergedProduct.images?.[0]?.url ||
-            "/images/placeholder-light.jpg"
+          mergedProduct.images?.[0]?.url ||
+          "/images/placeholder-light.jpg"
         )
 
         // Fetch product reviews
@@ -324,7 +324,7 @@ export default function ProductDetailPage() {
   // Dynamic breadcrumb items
   const breadcrumbItems = useMemo(() => {
     if (!product) return []
-    
+
     const items = [
       { name: "Home", href: "/" },
       { name: "Shop", href: "/shop" },
@@ -385,7 +385,7 @@ export default function ProductDetailPage() {
     if (product.categories?.[0]?.name) {
       return product.categories[0].name
     }
-    
+
     // Smart fallback detection based on handle & title
     const searchString = `${product.handle} ${product.title}`.toLowerCase()
     if (searchString.includes("bulb")) return "LED Bulbs"
@@ -399,7 +399,7 @@ export default function ProductDetailPage() {
     if (searchString.includes("wall")) return "Wall Lights"
     if (searchString.includes("ceiling")) return "Ceiling Lights"
     if (searchString.includes("track")) return "Track Lights"
-    
+
     return "LUMI Lighting"
   })()
 
@@ -425,7 +425,7 @@ export default function ProductDetailPage() {
   // WhatsApp chat links
   const getWhatsAppLink = () => {
     const text = `Hello LUMI Lighting,\n\nI am interested in:\nProduct: ${product.title} (${activeVariant?.title || "Default"})\nPrice: ${formattedCurrentPrice}\n\nPlease assist me.`
-    return `https://wa.me/254729686414?text=${encodeURIComponent(text)}`
+    return `https://wa.me/254706504644?text=${encodeURIComponent(text)}`
   }
 
 
@@ -438,7 +438,7 @@ export default function ProductDetailPage() {
     } catch (err) {
       console.error("Failed to add to cart:", err)
       const rawMsg = err instanceof Error ? err.message : String(err)
-      
+
       let userMsg = "Failed to add product to cart. Please try again."
       if (rawMsg.includes("insufficient_inventory")) {
         userMsg =
@@ -553,7 +553,7 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-2">
           {/* Images Gallery */}
           <div className="space-y-4">
-            <div 
+            <div
               onClick={() => {
                 const idx = product.images?.findIndex(img => img.url === activeImage) ?? 0
                 setZoomIndex(idx >= 0 ? idx : 0)
@@ -582,11 +582,10 @@ export default function ProductDetailPage() {
                   <div
                     key={img.url || idx}
                     onClick={() => setActiveImage(img.url)}
-                    className={`relative aspect-square cursor-pointer overflow-hidden rounded-xl border transition-all ${
-                      activeImage === img.url
+                    className={`relative aspect-square cursor-pointer overflow-hidden rounded-xl border transition-all ${activeImage === img.url
                         ? "border-amber-500 ring-2 ring-amber-500/20"
                         : "border-border hover:border-amber-500/50"
-                    }`}
+                      }`}
                   >
                     <Image
                       src={img.url}
@@ -617,11 +616,10 @@ export default function ProductDetailPage() {
                     return (
                       <Star
                         key={i}
-                        className={`h-4 w-4 ${
-                          isFilled
+                        className={`h-4 w-4 ${isFilled
                             ? "fill-amber-500 text-amber-500"
                             : "fill-none text-muted-foreground/30"
-                        }`}
+                          }`}
                       />
                     )
                   })}
@@ -672,8 +670,8 @@ export default function ProductDetailPage() {
                 <span className="inline-flex items-center gap-1.5 font-bold text-red-500 bg-red-500/10 px-2.5 py-1.5 rounded-xl border border-red-500/20">
                   <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse shrink-0" />
                   {cartError === "Sorry, this variant does not have enough stock available." &&
-                  product.variants &&
-                  product.variants.length > 1
+                    product.variants &&
+                    product.variants.length > 1
                     ? "Choose a different variant"
                     : "Out of Stock"}
                 </span>
@@ -706,13 +704,12 @@ export default function ProductDetailPage() {
                           setSelectedVariantIndex(i)
                           setCartError(null)
                         }}
-                        className={`cursor-pointer rounded-xl border px-4 py-2.5 text-xs font-bold transition-all flex items-center gap-1.5 ${
-                          selectedVariantIndex === i
+                        className={`cursor-pointer rounded-xl border px-4 py-2.5 text-xs font-bold transition-all flex items-center gap-1.5 ${selectedVariantIndex === i
                             ? "border-amber-500 bg-amber-500/10 text-amber-600"
                             : outOfStock
-                            ? "border-border bg-muted/20 text-muted-foreground/40 line-through opacity-60"
-                            : "border-border bg-background text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                        }`}
+                              ? "border-border bg-muted/20 text-muted-foreground/40 line-through opacity-60"
+                              : "border-border bg-background text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                          }`}
                       >
                         {v.title}
                         {outOfStock && <span className="text-[10px] text-red-500/80 font-normal ml-0.5">(Out of stock)</span>}
@@ -807,16 +804,14 @@ export default function ProductDetailPage() {
                 }
                 variant="outline"
                 size="lg"
-                className={`h-12 w-12 cursor-pointer p-0 rounded-xl border-border hover:bg-muted/30 transition-all ${
-                  isInWishlist(product.id)
+                className={`h-12 w-12 cursor-pointer p-0 rounded-xl border-border hover:bg-muted/30 transition-all ${isInWishlist(product.id)
                     ? "text-red-500 hover:text-red-600 border-red-500/20 bg-red-500/5 hover:bg-red-500/10"
                     : "text-muted-foreground hover:text-red-500"
-                }`}
+                  }`}
               >
                 <Heart
-                  className={`h-5 w-5 ${
-                    isInWishlist(product.id) ? "fill-current" : ""
-                  }`}
+                  className={`h-5 w-5 ${isInWishlist(product.id) ? "fill-current" : ""
+                    }`}
                 />
               </Button>
             </div>
@@ -959,11 +954,10 @@ export default function ProductDetailPage() {
                             className="cursor-pointer p-1 transition-transform hover:scale-110"
                           >
                             <Star
-                              className={`h-7 w-7 ${
-                                starValue <= reviewForm.rating
+                              className={`h-7 w-7 ${starValue <= reviewForm.rating
                                   ? "fill-amber-500 text-amber-500"
                                   : "fill-none text-muted-foreground/30"
-                              }`}
+                                }`}
                             />
                           </button>
                         )
@@ -1100,11 +1094,10 @@ export default function ProductDetailPage() {
                       return (
                         <Star
                           key={i}
-                          className={`h-4.5 w-4.5 ${
-                            isFilled
+                          className={`h-4.5 w-4.5 ${isFilled
                               ? "fill-amber-500 text-amber-500"
                               : "fill-none text-muted-foreground/30"
-                          }`}
+                            }`}
                         />
                       )
                     })}
@@ -1158,10 +1151,10 @@ export default function ProductDetailPage() {
                   {reviews.map((rev) => {
                     const date = rev.created_at
                       ? new Date(rev.created_at).toLocaleDateString("en-KE", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })
                       : ""
                     return (
                       <div
@@ -1176,11 +1169,10 @@ export default function ProductDetailPage() {
                                 return (
                                   <Star
                                     key={i}
-                                    className={`h-3.5 w-3.5 ${
-                                      isFilled
+                                    className={`h-3.5 w-3.5 ${isFilled
                                         ? "fill-amber-500 text-amber-500"
                                         : "fill-none text-muted-foreground/30"
-                                    }`}
+                                      }`}
                                   />
                                 )
                               })}
@@ -1481,11 +1473,10 @@ export default function ProductDetailPage() {
                       setZoomIndex(idx)
                       setZoomScale(1)
                     }}
-                    className={`relative w-12 h-12 rounded-lg overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
-                      zoomIndex === idx
+                    className={`relative w-12 h-12 rounded-lg overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${zoomIndex === idx
                         ? "border-amber-500 scale-105"
                         : "border-transparent opacity-50 hover:opacity-80"
-                    }`}
+                      }`}
                   >
                     <img
                       src={img.url}

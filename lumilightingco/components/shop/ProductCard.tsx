@@ -16,7 +16,7 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart()
   const { toggleWishlist, isInWishlist } = useWishlist()
-  
+
   // Get pricing from variants
   const defaultVariant = product.variants?.[0]
   const [selectedVariantId, setSelectedVariantId] = React.useState(
@@ -36,7 +36,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     if (product.categories?.[0]?.name) {
       return product.categories[0].name
     }
-    
+
     // Smart fallback detection based on handle & title
     const searchString = `${product.handle} ${product.title}`.toLowerCase()
     if (searchString.includes("bulb")) return "LED Bulbs"
@@ -50,7 +50,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     if (searchString.includes("wall")) return "Wall Lights"
     if (searchString.includes("ceiling")) return "Ceiling Lights"
     if (searchString.includes("track")) return "Track Lights"
-    
+
     return "LUMI Lighting"
   }, [product.categories, product.handle, product.title])
 
@@ -83,7 +83,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       ? ` (${selectedVariant.title})`
       : ""
     const text = `Hello LUMI Lighting,\n\nI am interested in:\nProduct: ${product.title}${variantName}\nPrice: ${formattedCurrentPrice}\n\nPlease assist me.`
-    return `https://wa.me/254729686414?text=${encodeURIComponent(text)}`
+    return `https://wa.me/254706504644?text=${encodeURIComponent(text)}`
   }
 
   const hasDiscount = !!discountRate
@@ -104,9 +104,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Dynamic Product Badge */}
       {product.metadata?.badge && (
         <span
-          className={`absolute z-10 rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold tracking-wide text-white uppercase shadow-sm ${
-            hasDiscount ? "top-11 left-3" : "top-3 left-3"
-          }`}
+          className={`absolute z-10 rounded-md bg-red-600 px-2 py-1 text-[10px] font-bold tracking-wide text-white uppercase shadow-sm ${hasDiscount ? "top-11 left-3" : "top-3 left-3"
+            }`}
         >
           {String(product.metadata.badge)}
         </span>
@@ -129,11 +128,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         className="absolute top-3 right-3 z-10 cursor-pointer rounded-full bg-background/80 p-2 shadow-xs backdrop-blur-xs transition-all duration-300 hover:bg-background hover:scale-110"
       >
         <Heart
-          className={`h-4 w-4 transition-colors ${
-            isInWishlist(product.id)
+          className={`h-4 w-4 transition-colors ${isInWishlist(product.id)
               ? "fill-red-500 text-red-500"
               : "text-muted-foreground hover:text-red-500"
-          }`}
+            }`}
         />
       </button>
 
@@ -175,11 +173,10 @@ export default function ProductCard({ product }: ProductCardProps) {
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  className={`h-3.5 w-3.5 ${
-                    i < Math.round(Number(averageRating))
+                  className={`h-3.5 w-3.5 ${i < Math.round(Number(averageRating))
                       ? "fill-amber-400 text-amber-400"
                       : "text-muted-foreground/30"
-                  }`}
+                    }`}
                 />
               ))}
               <span className="ml-1 text-xs text-muted-foreground">
