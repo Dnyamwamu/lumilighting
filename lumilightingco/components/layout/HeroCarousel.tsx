@@ -114,11 +114,8 @@ export default function HeroCarousel({
             index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
         >
-          {/* Desktop Diagonal Image Container */}
-          <div
-            className="absolute right-0 top-0 bottom-0 w-[58%] h-full z-0 overflow-hidden hidden lg:block animate-in fade-in duration-500"
-            style={{ clipPath: "polygon(14% 0, 100% 0, 100% 100%, 0% 100%)" }}
-          >
+          {/* Desktop Wave Image Container */}
+          <div className="absolute right-0 top-0 bottom-0 w-[58%] h-full z-0 overflow-hidden hidden lg:block animate-in fade-in duration-500">
             <Image
               src={slide.image}
               alt={slide.title}
@@ -128,10 +125,35 @@ export default function HeroCarousel({
               }`}
               priority={index === 0}
             />
-            {/* Soft gradient fade inside the cut */}
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/20 to-transparent" />
-            {/* Glowing neon cut line */}
-            <div className="absolute left-[13.9%] top-0 bottom-0 w-[2px] bg-gradient-to-b from-amber-500 via-orange-500/80 to-amber-500/20 shadow-lg" />
+            {/* Soft gradient fade inside the container */}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/25 to-transparent z-10" />
+
+            {/* Organic Wave Split SVG Overlay */}
+            <div className="absolute left-0 top-0 bottom-0 w-[140px] h-full z-20 pointer-events-none">
+              <svg
+                viewBox="0 0 100 1000"
+                className="h-full w-full fill-slate-950 text-slate-950"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <linearGradient id="waveGlow" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#ea580c" stopOpacity="1" />
+                    <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.3" />
+                  </linearGradient>
+                </defs>
+                {/* Wave mask area (covers left side of image container with background color) */}
+                <path d="M 0,0 L 100,0 C 50,250 12,400 12,500 C 12,600 50,750 100,1000 L 0,1000 Z" />
+                {/* Glowing neon path on wave boundary */}
+                <path
+                  d="M 100,0 C 50,250 12,400 12,500 C 12,600 50,750 100,1000"
+                  fill="none"
+                  stroke="url(#waveGlow)"
+                  strokeWidth="3.5"
+                  className="animate-pulse-glow"
+                />
+              </svg>
+            </div>
           </div>
 
           {/* Mobile Background Image (Full Span) */}
@@ -182,14 +204,14 @@ export default function HeroCarousel({
                     priority
                   />
                 </div>
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-400">
-                  <Sparkles className="h-3.5 w-3.5 animate-pulse" />
-                  {slide.badge}
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/5 px-3 py-1.5 text-xs font-bold text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.1)] backdrop-blur-md">
+                  <Sparkles className="h-3.5 w-3.5 text-amber-400 animate-spin-slow" />
+                  <span className="tracking-widest uppercase text-[10px]">{slide.badge}</span>
                 </div>
-                <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl leading-tight">
+                <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl leading-tight drop-shadow-md">
                   {slide.title}{" "}
                   {slide.highlight && (
-                    <span className="bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-300 bg-clip-text text-transparent drop-shadow-[0_2px_15px_rgba(245,158,11,0.3)]">
                       {slide.highlight}
                     </span>
                   )}
@@ -201,7 +223,7 @@ export default function HeroCarousel({
                   <Link href={slide.ctaLink}>
                     <Button
                       size="lg"
-                      className="h-12 cursor-pointer gap-2 rounded-xl bg-amber-500 px-6 font-bold text-white shadow-lg shadow-amber-500/25 hover:bg-amber-600"
+                      className="h-12 cursor-pointer gap-2 rounded-xl bg-amber-500 hover:bg-amber-600 px-6 font-bold text-white shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center"
                     >
                       {slide.ctaText} <ArrowRight className="h-4 w-4" />
                     </Button>
@@ -210,7 +232,7 @@ export default function HeroCarousel({
                     <Button
                       size="lg"
                       variant="outline"
-                      className="h-12 cursor-pointer border-slate-700 bg-slate-900/60 px-6 text-slate-200 hover:bg-slate-900 hover:border-slate-500"
+                      className="h-12 cursor-pointer border-slate-700 hover:border-amber-500 bg-slate-900/40 hover:bg-slate-950 px-6 text-slate-200 hover:text-white rounded-xl shadow-xs transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center"
                     >
                       Room Calculator
                     </Button>
@@ -227,14 +249,14 @@ export default function HeroCarousel({
         <>
           <button
             onClick={prevSlide}
-            className="absolute top-1/2 left-3 sm:left-6 z-20 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-slate-700 bg-slate-900/80 text-white shadow-lg backdrop-blur-md transition-all hover:bg-amber-500 hover:border-amber-500 hover:text-white"
+            className="absolute top-1/2 left-3 sm:left-6 z-30 flex h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-slate-950/40 text-slate-300 hover:text-white hover:border-amber-500/80 hover:bg-slate-950/80 shadow-[0_0_15px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all duration-300 hover:scale-110"
             aria-label="Previous Slide"
           >
             <ChevronLeft className="h-6 w-6" />
           </button>
           <button
             onClick={nextSlide}
-            className="absolute top-1/2 right-3 sm:right-6 z-20 flex h-11 w-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-slate-700 bg-slate-900/80 text-white shadow-lg backdrop-blur-md transition-all hover:bg-amber-500 hover:border-amber-500 hover:text-white"
+            className="absolute top-1/2 right-3 sm:right-6 z-30 flex h-12 w-12 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-slate-950/40 text-slate-300 hover:text-white hover:border-amber-500/80 hover:bg-slate-950/80 shadow-[0_0_15px_rgba(0,0,0,0.5)] backdrop-blur-md transition-all duration-300 hover:scale-110"
             aria-label="Next Slide"
           >
             <ChevronRight className="h-6 w-6" />
@@ -249,8 +271,11 @@ export default function HeroCarousel({
             <button
               key={`indicator-${s.id}`}
               onClick={() => setCurrentSlide(index)}
-              className={`group relative h-3 cursor-pointer rounded-full transition-all duration-300 ${index === currentSlide ? "w-10 bg-amber-500" : "w-3 bg-slate-600 hover:bg-slate-400"
-                }`}
+              className={`group relative h-2.5 cursor-pointer rounded-full transition-all duration-300 ${
+                index === currentSlide 
+                  ? "w-8 bg-gradient-to-r from-amber-400 to-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" 
+                  : "w-2.5 bg-slate-700 hover:bg-slate-500"
+              }`}
               aria-label={`Go to slide ${index + 1}`}
             >
               <span className="sr-only">Slide {index + 1}</span>
